@@ -1,0 +1,29 @@
+# 5-Minute Presentation Script: Predicting Short-Form Video Engagement
+
+**Total Estimated Time:** 5:00
+**Theme:** Integrating Content, Context, and Creator Features for Pre-Publication Prediction.
+
+---
+
+### [0:00 - 1:00] Introduction: The Challenge of Prediction
+**Speaker:** Good morning/afternoon. Today, I am presenting our research on predicting short-form video engagement before a video even goes live. As highlighted by **Sun et al. (2025)** and the **VQualA 2025 Challenge (Li et al., 2025)**, predicting popularity is incredibly difficult because it’s not just about visual quality. Traditional metrics like view counts often fail to capture the nuance of how a viewer actually interacts with content. 
+
+In this study, we shift our focus away from "vanity metrics" toward two critical behavioral indicators: **ECR (Engagement Continuation Rate)**—the probability a viewer stays past the first 5 seconds—and **NAWP (Normalized Average Watch Percentage)**. Our goal is to empower micro-creators by providing them with an ensemble model that understands their content as deeply as a human viewer would.
+
+### [1:00 - 2:30] The Literature: Beyond Visuals
+**Speaker:** Our research stands on the shoulders of recent breakthroughs in Large Multimodal Models, or LMMs. **Li et al. (2024)** in "Delving Deep into Engagement Prediction" demonstrated that Mean Opinion Scores for visual quality do *not* correlate with engagement. A high-definition video can still flop if it lacks a "hook."
+
+This is why our framework integrates multiple signals. Following the work of **Xiao et al. (2024)** and **Sun et al. (2025)**, we recognize that audio features and textual captions are just as vital as the visual frame. **Pang et al. (2023)** also noted that while visual information has the greatest impact, accuracy only truly peaks when we use cross-modal fusion. We aren't just looking at the video; we're listening to the background music and reading the hashtags to build a 360-degree understanding of the "vibe."
+
+### [2:30 - 3:45] The Model Architecture
+**Speaker:** To achieve this, we employ an ensemble of three powerful frozen LMM backbones: **VideoLLaMA2** for spatiotemporal understanding, **Qwen2.5-VL** for visual reasoning, and **InternVideo2** for dynamic analysis. 
+
+But content is only half the story. **Wies et al. (2023)** and **Peng & Lu (2024)** have shown that creator features—specifically follower count and account age—act as a "Goldilocks" factor in how algorithms push content. Furthermore, **Kanuri et al. (2018)** and **Spasojevic et al. (2015)** emphasize the "When-to-post" factor. Our model doesn't just analyze the MP4 file; it contextualizes that file within the creator's history and the specific time of posting to predict that crucial five-second hook.
+
+### [3:45 - 4:45] Findings and Implications
+**Speaker:** What have we learned from the current state of the art? **Guan et al. (2025)** and the results from the VQualA challenge show that multimodal approaches consistently outperform single-modality baselines. More importantly, we see that non-visual features—like the sentiment of a caption or the tempo of a song—can make or break a prediction.
+
+For creators, especially the Filipino micro-creators we are studying, this means the "hook" isn't just a visual trick; it's a multimodal harmony. By focusing on ECR and NAWP, we provide a more stable ground for prediction than the volatile nature of "going viral."
+
+### [4:45 - 5:00] Conclusion
+**Speaker:** To predict is, indeed, to believe in the data behind the creativity. By integrating content, context, and creator features, we move closer to a world where creators have a scientific partner in their creative process. Thank you for your time, and I am now open for any questions.

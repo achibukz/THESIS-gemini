@@ -1,0 +1,17 @@
+# Revised Subsection: Ethical Safeguards and Limitations
+
+\subsection{Ethical Safeguards and Limitations}
+
+Ethical integrity is foundational to the data donation framework, particularly given the multimodal nature of short-form video content. To ensure participant autonomy and privacy, the following multi-staged safeguards will be implemented:
+
+\subsubsection{Data Anonymization and De-identification}
+A primary safeguard involves a "privacy-first" submission pipeline. Before data is integrated into the model, a standardized de-identification protocol will be applied to all donated TikTok archives. All personally identifiable information (PII), including usernames, profile pictures, and unique account handles, will be stripped and replaced with randomized alphanumeric identifiers. Following the methodology of Zannettou et al. (2024), participants will be provided with an optional client-side script or interface that allows them to review and redact sensitive metadata—such as search history or private comments—prior to final submission.
+
+\subsubsection{Facial Privacy and Biometric Protection}
+Recognizing the sensitivity of biometric data, the informed consent process will explicitly detail the extent of visual processing. While the Large Multimodal Models (LMMs) require facial keyframes to analyze creator-centric features (e.g., facial expressions and engagement cues), this data will be treated as high-dimensional embeddings rather than raw biometric templates. To protect non-consenting third parties who may incidentally appear in the background of a creator's video, the research team will employ automated face-detection using MTCNN (Multi-task Cascaded Convolutional Networks) or similar architectures. A Gaussian blur with a kernel size of 25x25 will be applied to all detected faces of secondary subjects, ensuring their likeness is obscured while maintaining the overall spatiotemporal integrity of the video for engagement analysis.
+
+\subsubsection{Participant Rights and Data Governance}
+The study strictly adheres to the data donation principle of user-initiated sharing, ensuring compliance with TikTok’s Terms of Service and the Data Privacy Act of 2012 (RA 10173). All raw MP4 files and analytics exports will be stored in an AES-256 encrypted environment with access restricted solely to the primary research team. Participants maintain a persistent right to withdrawal; upon request, their donated data will be permanently purged from the local storage environment and excluded from all future model iterations, provided the request is made before the final model aggregation phase.
+
+\subsubsection{Limitations}
+While this approach offers granular, first-party ground truth data, it is subject to certain limitations. The reliance on a volunteer-based cohort of 30 to 50 Filipino micro-creators introduces potential selection bias, as creators who are more confident in their performance metrics may be more likely to donate. Additionally, the computational trade-off of using frozen LMM backbones limits the model's ability to fine-tune on specific cultural nuances of the Filipino digital landscape, though the ensemble architecture is designed to mitigate this through high-level semantic reasoning.

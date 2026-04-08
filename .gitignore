@@ -1,5 +1,6 @@
 # --- Sensitive Research Data ---
 /sensitive_data/
+/thesis/
 
 # --- Local Environment & IDE ---
 .DS_Store
