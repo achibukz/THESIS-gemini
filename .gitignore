@@ -1,0 +1,9 @@
+# --- Sensitive Research Data ---
+/sensitive_data/
+
+# --- Local Environment & IDE ---
+.DS_Store
+.vscode/
+.env
+__pycache__/
+*.log

@@ -1,0 +1,227 @@
+,,,,,,,,,,,,,,
+,RRL MATRIX,,,,,,,,,,,,,
+,No. ,Author/s ,Journal/ Research Articles Title,Date of Publication,Research Problem/ Purpose of the Study,Variables/ Terms under Study,Model/s Used,Major Contribution,Major Findings,Other Key Findings,Conclusions & Recommendations,Additional Comments,Bibtex,APA Citation
+,P01,"Li, D., Ma, S., Hua, H., Li, W., Wang, J., Zhou, C. W., ... & Lyu, H. ",VQualA 2025 Challenge on Engagement Prediction for Short Videos: Methods and Results,2025,understanding & modeling popularity of user generated short videos ono social media platforms,"UGC: user generated content
+LMM: large multimodal model
+ECR: engagement continuation rate
+MLP"" Multi Layer Perceptron","Video-LLaMA2, Qwen2.5-VL, DOVER, CLIP, BERT, BEATs, Skywork-VL, XGBoost regression ","Engagement Metrics, Model, Dataset",those who used multimodal approaches did better than baseline,non-visual (ie text) can still contribute to prediction,,paper on competition,"@inproceedings{li2025vquala,
+  title={Vquala 2025 challenge on engagement prediction for short videos: Methods and results},
+  author={Li, Dasong and Ma, Sizhuo and Hua, Hang and Li, Wenjie and Wang, Jian and Zhou, Chris Wei and Guan, Fengbin and Li, Xin and Yu, Zihao and Lu, Yiting and others},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={3391--3401},
+  year={2025}
+}","Li, D., Ma, S., Hua, H., Li, W., Wang, J., Zhou, C. W., ... & Lyu, H. (2025). Vquala 2025 challenge on engagement prediction for short videos: Methods and results. In Proceedings of the IEEE/CVF International Conference on Computer Vision (pp. 3391-3401)."
+,P02,"Sun, W., Cao, L., Cao, Y., Zhang, W., Wen, W., Zhang, K., ... & Zhai, G.",Engagement Prediction of Short Videos with Large Multimodal Models,2025,"optimize recommendation systems on short form video platforms. this is hard bc of many complex and intertwined factors (semantics, sound, etc)","SROCC: Spearman Ranked Order Correlation Coefficient
+PLCC: Pearson Linear Correlation Coefficient","Video-LLaMA2, Qwen2.5-VL",Model,audio features are also important in engagement prediction. not just visual and textual,,LMMs have potential in modelling engagement patterns,,"@inproceedings{sun2025engagement,
+  title={Engagement Prediction of Short Videos with Large Multimodal Models},
+  author={Sun, Wei and Cao, Linhan and Cao, Yuqin and Zhang, Weixia and Wen, Wen and Zhang, Kaiwei and Chen, Zijian and Lu, Fangfang and Min, Xiongkuo and Zhai, Guangtao},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={3402--3411},
+  year={2025}
+}","Sun, W., Cao, L., Cao, Y., Zhang, W., Wen, W., Zhang, K., ... & Zhai, G. (2025). Engagement Prediction of Short Videos with Large Multimodal Models. In Proceedings of the IEEE/CVF International Conference on Computer Vision (pp. 3402-3411)."
+,P03,"Xiao, L., Li, X., & Zhang, Y. ",Exploring the factors influencing consumer engagement behavior regarding short-form video advertising: A big data perspective.,,,,,"Short Form Videos, Psychology",,,,,"@article{xiao2023exploring,
+  title={Exploring the factors influencing consumer engagement behavior regarding short-form video advertising: A big data perspective},
+  author={Xiao, Lin and Li, Xiaofeng and Zhang, Yucheng},
+  journal={Journal of Retailing and Consumer Services},
+  volume={70},
+  pages={103170},
+  year={2023},
+  publisher={Elsevier}
+}","Xiao, L., Li, X., & Zhang, Y. (2023). Exploring the factors influencing consumer engagement behavior regarding short-form video advertising: A big data perspective. Journal of Retailing and Consumer Services, 70, 103170."
+,P04,"Violot, C., Elmas, T., Bilogrevic, I., & Humbert, M. ",Shorts vs. regular videos on YouTube: A comparative analysis of user engagement and content creation trends. ,,,,,"Short Form Videos, Dataset","- The dataset highlights how engagement differs between formats; for example, it quantifies how ""Shorts"" often achieve higher view counts but different comment-to-view ratios compared to regular videos.",,,,"@inproceedings{violot2024shorts,
+  title={Shorts vs. regular videos on YouTube: A comparative analysis of user engagement and content creation trends},
+  author={Violot, Caroline and Elmas, Tu{\u{g}}rulcan and Bilogrevic, Igor and Humbert, Mathias},
+  booktitle={Proceedings of the 16th ACM Web Science Conference},
+  pages={213--223},
+  year={2024}
+}","Violot, C., Elmas, T., Bilogrevic, I., & Humbert, M. (2024, May). Shorts vs. regular videos on YouTube: A comparative analysis of user engagement and content creation trends. In Proceedings of the 16th ACM Web Science Conference (pp. 213-223)."
+,P05,"Xiao, L., Li, X., & Mou, J.",Exploring user engagement behavior with short-form video advertising on short-form video platforms: a visual-audio perspective. ,2024,,,,,,,,,"@article{xiao2024exploring,
+  title={Exploring user engagement behavior with short-form video advertising on short-form video platforms: a visual-audio perspective},
+  author={Xiao, Lin and Li, Xiaofeng and Mou, Jian},
+  journal={Internet Research},
+  year={2024},
+  publisher={Emerald Publishing Limited}
+}","Xiao, L., Li, X., & Mou, J. (2024). Exploring user engagement behavior with short-form video advertising on short-form video platforms: a visual-audio perspective. Internet Research."
+,P06,"Li, D., Li, W., Lu, B., Li, H., Ma, S., Krishnan, G., & Wang, J.",Delving deep into engagement prediction of short videos.,2024,How to model engagement levels purely from video content. This helps video creators and recommendation system even if there are limited initial user interactions,"- Mean Opinion Scores (MOS) 
+- Normalized Average Watch Percentage (NAWP)
+- Engagement Continuation Rate (ECR)",,"Model, Dataset","- The MOS from traditional video quality assessment datasets do not correlate with actual video engagement levels. High visual quality does not necessarily mean high popularity
+
+- NAWP is better to make the engagement of the prediction better
+- ECR also helps the likelihood of users continuing to watch the video","The study finds that combining features from visual content, background music, and text helps enhances the accuracy of engagement prediction compared to just the visuals alone",,"Dataset used: 90,000 real-world UGC short videos from Snapchat","@inproceedings{li2024delving,
+  title={Delving deep into engagement prediction of short videos},
+  author={Li, Dasong and Li, Wenjie and Lu, Baili and Li, Hongsheng and Ma, Sizhuo and Krishnan, Gurunandan and Wang, Jian},
+  booktitle={European Conference on Computer Vision},
+  pages={289--306},
+  year={2024},
+  organization={Springer}
+}","Li, D., Li, W., Lu, B., Li, H., Ma, S., Krishnan, G., & Wang, J. (2024, September). Delving deep into engagement prediction of short videos. In European Conference on Computer Vision (pp. 289-306). Cham: Springer Nature Switzerland."
+,P07,"Cho, M., Jeong, D., & Park, E. ",AMPS: Predicting popularity of short-form videos using multi-modal attention mechanisms in social media marketing environments,2024,,,,"Model, Dataset",,,,,"@article{cho2024amps,
+  title={AMPS: Predicting popularity of short-form videos using multi-modal attention mechanisms in social media marketing environments},
+  author={Cho, Minhwa and Jeong, Dahye and Park, Eunil},
+  journal={Journal of Retailing and Consumer Services},
+  volume={78},
+  pages={103778},
+  year={2024},
+  publisher={Elsevier}
+}","Cho, M., Jeong, D., & Park, E. (2024). AMPS: Predicting popularity of short-form videos using multi-modal attention mechanisms in social media marketing environments. Journal of Retailing and Consumer Services, 78, 103778."
+,P08,"Kai Zhao, Kun Yuan, Ming Sun and Xing Wen Kuaishou Technology","Zoom-VQA: Patches, Frames and Clips Integration for Video Quality Assessment",2023,"The purpose of the study is to simulate human perception of video quality based on Patches, Frames and Clips and not just factoring single frames of the video.",,They have their own model: https://github.com/k-zha14/Zoom-VQA,,"The study found that different levels of the video reveal specific quality issues: motion blur is best reflected at the clip level, semantic information at the frame level, and local artifacts/noise at the patch level.",,,,,
+,P09,"Qihang Ge, Wei Sun, Yu Zhang, Yunhao Li, Zhongpeng Ji, Fengyu Sun, Shangling Jui, Xiongkuo Min, Member, IEEE, Guangtao Zhai, Senior Member, IEEE",LMM-VQA: Advancing Video Quality Assessment with Large Multimodal Models,2024,"The primary goal was to address the limitations of traditional VQA algorithms, which often struggle to model the complex relationship between diverse video content and various spatial-temporal distortions",,"Video-ChatGPT, LLaMA-VID, VideoLLaMA2, LLaVA-NeXT-Video, VILA-1.5",Model,"The framework successfully generated both a numerical quality score and a descriptive quality level (good, fair, poor)",,,,"@article{ge2025lmm,
+  title={Lmm-vqa: Advancing video quality assessment with large multimodal models},
+  author={Ge, Qihang and Sun, Wei and Zhang, Yu and Li, Yunhao and Ji, Zhongpeng and Sun, Fengyu and Jui, Shangling and Min, Xiongkuo and Zhai, Guangtao},
+  journal={IEEE Transactions on Circuits and Systems for Video Technology},
+  year={2025},
+  publisher={IEEE}
+}","Ge, Q., Sun, W., Zhang, Y., Li, Y., Ji, Z., Sun, F., ... & Zhai, G. (2025). Lmm-vqa: Advancing video quality assessment with large multimodal models. IEEE Transactions on Circuits and Systems for Video Technology."
+,P10,"Sadeque, F., & Bethard, S.",Predicting engagement in online social networks: Challenges and opportunities,2019,survey on predicting engagement in social networks,,,,,,,,"@article{sadeque2019predicting,
+  title={Predicting engagement in online social networks: Challenges and opportunities},
+  author={Sadeque, Farig and Bethard, Steven},
+  journal={arXiv preprint arXiv:1907.05442},
+  year={2019}
+}","Sadeque, F., & Bethard, S. (2019). Predicting engagement in online social networks: Challenges and opportunities. arXiv preprint arXiv:1907.05442."
+,P11,"Pang, N., Guo, S., Yan, M., & Chan, C. A.",A Short Video Classification Framework Based on Cross-Modal Fusion,2023,"Short form videos uploaded by users are very random, and user’s understanding of video categories also vary. Classification of short videos are important so that unlabeled videos can be organized in the same way as those with labeled categories.",,"NextVLAD, AttentionCluster, NextVLAD-AttentionCluster",,"visual information has greatest impact on video classification
+
+accuracy of the model can be improved by modality fusion",,,for future work: increase type and number of videos for improved classification performance,"@article{pang2023short,
+  title={A short video classification framework based on cross-modal fusion},
+  author={Pang, Nuo and Guo, Songlin and Yan, Ming and Chan, Chien Aun},
+  journal={Sensors},
+  volume={23},
+  number={20},
+  pages={8425},
+  year={2023},
+  publisher={MDPI}
+}","Pang, N., Guo, S., Yan, M., & Chan, C. A. (2023). A short video classification framework based on cross-modal fusion. Sensors, 23(20), 8425."
+,P12,"Guan, F., Yu, Z., Lu, Y., Luo, W., Gao, Y., Li, X., & Chen, Z.",MMF-QE: Advanced Multi-Modal Fusion for Quality Assessment and Engagement Prediction in User-Generated Short Videos,2025,,,,Model,,,,,"@inproceedings{guan2025mmf,
+  title={MMF-QE: Advanced Multi-Modal Fusion for Quality Assessment and Engagement Prediction in User-Generated Short Videos},
+  author={Guan, Fengbin and Yu, Zihao and Lu, Yiting and Luo, Wei and Gao, Yixin and Li, Xin and Chen, Zhibo},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={3458--3465},
+  year={2025}
+}","Guan, F., Yu, Z., Lu, Y., Luo, W., Gao, Y., Li, X., & Chen, Z. (2025). MMF-QE: Advanced Multi-Modal Fusion for Quality Assessment and Engagement Prediction in User-Generated Short Videos. In Proceedings of the IEEE/CVF International Conference on Computer Vision (pp. 3458-3465)."
+,P13,,Beyond Views: Measuring and Predicting Engagement in Online Videos,2018,,,,,,,,,"@inproceedings{wu2018beyond,
+  title={Beyond views: Measuring and predicting engagement in online videos},
+  author={Wu, Siqi and Rizoiu, Marian-Andrei and Xie, Lexing},
+  booktitle={Proceedings of the international AAAI conference on web and social media},
+  volume={12},
+  number={1},
+  year={2018}
+}","Wu, S., Rizoiu, M. A., & Xie, L. (2018, June). Beyond views: Measuring and predicting engagement in online videos. In Proceedings of the international AAAI conference on web and social media (Vol. 12, No. 1)."
+,P14,,https://www.emerald.com/intr/article-abstract/36/1/154/1255369/Exploring-user-engagement-behavior-with-short-form?redirectedFrom=fulltext,,,,,,,,,,,
+,P15,,Analyzing user engagement with TikTok's short format video recommendations using data donations,,,,,,,,,,"@inproceedings{zannettou2024analyzing,
+  title={Analyzing user engagement with TikTok's short format video recommendations using data donations},
+  author={Zannettou, Savvas and Nemes-Nemeth, Olivia and Ayalon, Oshrat and Goetzen, Angelica and Gummadi, Krishna P and Redmiles, Elissa M and Roesner, Franziska},
+  booktitle={Proceedings of the 2024 CHI Conference on Human Factors in Computing Systems},
+  pages={1--16},
+  year={2024}
+}","Zannettou, S., Nemes-Nemeth, O., Ayalon, O., Goetzen, A., Gummadi, K. P., Redmiles, E. M., & Roesner, F. (2024, May). Analyzing user engagement with TikTok's short format video recommendations using data donations. In Proceedings of the 2024 CHI Conference on Human Factors in Computing Systems (pp. 1-16)."
+,P16,"Boeker, M., & Urman, A.",An empirical investigation of personalization factors on TikTok,2022,,,,,,,,,"@inproceedings{boeker2022empirical,
+  title={An empirical investigation of personalization factors on TikTok},
+  author={Boeker, Maximilian and Urman, Aleksandra},
+  booktitle={Proceedings of the ACM web conference 2022},
+  pages={2298--2309},
+  year={2022}
+}","Boeker, M., & Urman, A. (2022, April). An empirical investigation of personalization factors on TikTok. In Proceedings of the ACM web conference 2022 (pp. 2298-2309)."
+,P17,"Bravin, M., Clegg, M., Hofstetter, R., Pouly, M., & Berger, J. A.",How to Follow Social Media Trends? An Empirical Investigation Using TikTok Short Video Data,2025,,,,,,,,,"@article{bravin2025follow,
+  title={How to follow social media trends? An empirical investigation using TikTok short video data},
+  author={Bravin, Marc and Clegg, Melanie and Hofstetter, Reto and Pouly, Marc and Berger, Jonah A},
+  journal={An Empirical Investigation Using TikTok Short Video Data (January 01, 2025)},
+  year={2025}
+}","Bravin, M., Clegg, M., Hofstetter, R., Pouly, M., & Berger, J. A. (2025). How to follow social media trends? An empirical investigation using TikTok short video data. An Empirical Investigation Using TikTok Short Video Data (January 01, 2025)."
+,P18,"Kanuri, V. K., Chen, Y., & Sridhar, S.","Scheduling content on social media: Theory, evidence, and application.",2018,,,,,,,,,"@article{kanuri2018scheduling,
+  title={Scheduling content on social media: Theory, evidence, and application},
+  author={Kanuri, Vamsi K and Chen, Yixing and Sridhar, Shrihari},
+  journal={Journal of Marketing},
+  volume={82},
+  number={6},
+  pages={89--108},
+  year={2018},
+  publisher={Sage Publications Sage CA: Los Angeles, CA}
+}","Kanuri, V. K., Chen, Y., & Sridhar, S. (2018). Scheduling content on social media: Theory, evidence, and application. Journal of Marketing, 82(6), 89-108."
+,P19,"Manic, M.",Short-form video content and consumer engagement in digital landscapes. ,2024,,,,,,,,,"@article{manic2024short,
+  title={Short-form video content and consumer engagement in digital landscapes},
+  author={Manic, Marius},
+  journal={Bulletin of the Transilvania University of Brasov. Series V: Economic Sciences},
+  pages={45--52},
+  year={2024}
+}","Manic, M. (2024). Short-form video content and consumer engagement in digital landscapes. Bulletin of the Transilvania University of Brasov. Series V: Economic Sciences, 45-52."
+,P20,"Peng, Y., & Lu, L.",Untangling influence: The effect of follower-followee comparison on social media engagement.,2024,,,,Features,,,,,"@article{peng2024untangling,
+  title={Untangling influence: The effect of follower-followee comparison on social media engagement},
+  author={Peng, Yi and Lu, Liling},
+  journal={Journal of Retailing and Consumer Services},
+  volume={78},
+  pages={103747},
+  year={2024},
+  publisher={Elsevier}
+}","Peng, Y., & Lu, L. (2024). Untangling influence: The effect of follower-followee comparison on social media engagement. Journal of Retailing and Consumer Services, 78, 103747."
+,P21,"Wies, S., Bleier, A., & Edeling, A.",Finding goldilocks influencers: How follower count drives social media engagement.,2023,,,,Features,,,,,"@article{wies2023finding,
+  title={Finding goldilocks influencers: How follower count drives social media engagement},
+  author={Wies, Simone and Bleier, Alexander and Edeling, Alexander},
+  journal={Journal of Marketing},
+  volume={87},
+  number={3},
+  pages={383--405},
+  year={2023},
+  publisher={SAGE Publications Sage CA: Los Angeles, CA}
+}","Wies, S., Bleier, A., & Edeling, A. (2023). Finding goldilocks influencers: How follower count drives social media engagement. Journal of Marketing, 87(3), 383-405."
+,P22,"Zannettou, S., Nemes-Nemeth, O., Ayalon, O., Goetzen, A., Gummadi, K. P., Redmiles, E. M., & Roesner, F. ",Analyzing user engagement with TikTok's short format video recommendations using data donations.,2024,,,,Psychology,,,,,"@inproceedings{zannettou2024analyzing,
+  title={Analyzing user engagement with TikTok's short format video recommendations using data donations},
+  author={Zannettou, Savvas and Nemes-Nemeth, Olivia and Ayalon, Oshrat and Goetzen, Angelica and Gummadi, Krishna P and Redmiles, Elissa M and Roesner, Franziska},
+  booktitle={Proceedings of the 2024 CHI Conference on Human Factors in Computing Systems},
+  pages={1--16},
+  year={2024}
+}","Zannettou, S., Nemes-Nemeth, O., Ayalon, O., Goetzen, A., Gummadi, K. P., Redmiles, E. M., & Roesner, F. (2024, May). Analyzing user engagement with TikTok's short format video recommendations using data donations. In Proceedings of the 2024 CHI Conference on Human Factors in Computing Systems (pp. 1-16)."
+,P23,"Rahman, S., Mun, H., Lee, H., Lee, Y., Tornatore, M., & Mukherjee, B.",Insights from Analysis of Video Streaming Data to Improve Resource Management,2018,,,,Engagement Metrics,,,,,"@INPROCEEDINGS{8549180,
+  author={Rahman, Sabidur and Mun, Hyunsu and Lee, Hyongjin and Lee, Youngseok and Tornatore, Massimo and Mukherjee, Biswanath},
+  booktitle={2018 IEEE 7th International Conference on Cloud Networking (CloudNet)}, 
+  title={Insights from Analysis of Video Streaming Data to Improve Resource Management}, 
+  year={2018},
+  volume={},
+  number={},
+  pages={1-3},
+  keywords={Streaming media;Resource management;Tools;IP networks;Big Data;Smart phones;User behavior;video streaming;cloud network management;data analysis;Apache Spark},
+  doi={10.1109/CloudNet.2018.8549180}}
+","Rahman, S., Mun, H., Lee, H., Lee, Y., Tornatore, M., & Mukherjee, B. (2018, October). Insights from analysis of video streaming data to improve resource management. In 2018 IEEE 7th International Conference on Cloud Networking (CloudNet) (pp. 1-3). Ieee."
+,P24,"Xiao, L., Sun, L., Lei, Z., & Fu, B. ",How do features in health short-form videos impact viewer engagement: An empirical study. Industrial Management & Data Systems,,,,,Features,,,,,"@article{xiao2026features,
+  title={How do features in health short-form videos impact viewer engagement: An empirical study},
+  author={Xiao, Lin and Sun, Lingfeng and Lei, Zhiming and Fu, Bin},
+  journal={Industrial Management \& Data Systems},
+  volume={126},
+  number={2},
+  pages={678--709},
+  year={2026},
+  publisher={Emerald Publishing Limited}
+}","Xiao, L., Sun, L., Lei, Z., & Fu, B. (2026). How do features in health short-form videos impact viewer engagement: An empirical study. Industrial Management & Data Systems, 126(2), 678-709."
+,P25,"Zhang, C., Zheng, H., & Wang, Q. ",Driving factors and moderating effects behind citizen engagement with mobile short-form videos.,,,,,Features,,,,,"@article{zhang2022driving,
+  title={Driving factors and moderating effects behind citizen engagement with mobile short-form videos},
+  author={Zhang, Cevin and Zheng, Hemingxi and Wang, Qing},
+  journal={IEEE Access},
+  volume={10},
+  pages={40999--41009},
+  year={2022},
+  publisher={IEEE}
+}","Zhang, C., Zheng, H., & Wang, Q. (2022). Driving factors and moderating effects behind citizen engagement with mobile short-form videos. IEEE Access, 10, 40999-41009."
+,P26,"Zhang, X., Zhao, Z., & Wang, K.",The effects of live comments and advertisements on social media engagement: application to short-form online video. ,,,,,Features,,,,,"@article{zhang2024effects,
+  title={The effects of live comments and advertisements on social media engagement: application to short-form online video},
+  author={Zhang, Xiaodan and Zhao, Zhanbo and Wang, Kui},
+  journal={Journal of Research in Interactive Marketing},
+  volume={18},
+  number={3},
+  pages={485--505},
+  year={2024},
+  publisher={Emerald Publishing Limited}
+}","Zhang, X., Zhao, Z., & Wang, K. (2024). The effects of live comments and advertisements on social media engagement: application to short-form online video. Journal of Research in Interactive Marketing, 18(3), 485-505."
+,P27,"Spasojevic, N., Li, Z., Rao, A., & Bhattacharyya, P.",When-to-post on social networks,2015,,,,Features,,,,,"@inproceedings{spasojevic2015post,
+  title={When-to-post on social networks},
+  author={Spasojevic, Nemanja and Li, Zhisheng and Rao, Adithya and Bhattacharyya, Prantik},
+  booktitle={Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  pages={2127--2136},
+  year={2015}
+}","Spasojevic, N., Li, Z., Rao, A., & Bhattacharyya, P. (2015, August). When-to-post on social networks. In Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (pp. 2127-2136)."
+,P28,"Lee, B.", A temporal analysis of posting behavior in social media streams,2012,,,,,,,,,"@inproceedings{lee2012temporal,
+  title={A temporal analysis of posting behavior in social media streams},
+  author={Lee, Bumsuk},
+  booktitle={Proceedings of the International AAAI Conference on Web and Social Media},
+  volume={6},
+  number={4},
+  pages={18--21},
+  year={2012}
+}","Lee, B. (2012). A temporal analysis of posting behavior in social media streams. In Proceedings of the International AAAI Conference on Web and Social Media (Vol. 6, No. 4, pp. 18-21)."
