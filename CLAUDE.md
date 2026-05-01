@@ -16,7 +16,7 @@ This is a thesis research repository for **"To Predict Is To Believe: Integratin
 
 ## Repository Name
 
-The repo lives at `~/Code/GitHub/THESIS` (formerly `THESIS-gemini`). If you see references to the old name anywhere, update them.
+The repo lives at `~/Code/GitHub/sfv-thesis` (formerly `THESIS-gemini`, then `THESIS`). If you see references to the old names anywhere, update them.
 
 ## Repository Structure
 
@@ -24,7 +24,7 @@ The repo lives at `~/Code/GitHub/THESIS` (formerly `THESIS-gemini`). If you see 
 - `sources/` — Academic references (`references.bib`, `rrl_matrix.csv`) and source PDFs in `sources/papers/`
 - `outputs/` — Generated artifacts (scripts, revised sections, model predictions)
 - `data_specs/`, `sensitive_data/` — Dataset specifications and participant data (treat as sensitive)
-- `LMM-EVQA/` — **Vendored upstream** code from https://github.com/sunwei925/LMM-EVQA. Treated as read-only; never edit files inside this directory.
+- `lmm-evqa/` — **Vendored upstream** code from https://github.com/sunwei925/LMM-EVQA. Treated as read-only; never edit files inside this directory.
 - `pipeline/` — Our `uv`-managed Python project. All local code lives here: adapters, configs, dataset loaders, ensemble, evaluation, and the `.venv`. This is the main project folder.
 - `data/`, `checkpoints/` — Gitignored. Hold downloaded SnapUGC subsets and fine-tuned model weights respectively.
 - `plan.md` — Active working plan for the LMM-EVQA baseline reproduction. Update this when scope changes.
@@ -79,8 +79,10 @@ API keys and credentials live in `pipeline/.env` — never commit that file (cov
 The active engineering effort is reproducing **Sun et al. 2025 (LMM-EVQA)** on small SnapUGC subsets (SnapUGC-tiny → SnapUGC-mini) before extending it with thesis-specific creator/context features. Full plan: `plan.md`.
 
 Working rules:
-- **Never edit files inside `LMM-EVQA/`.** Treat it as a read-only vendored snapshot. All adapter/wrapper/ensemble/eval code lives in `pipeline/`. The invariant `git diff LMM-EVQA/` should always be empty.
-- **Hardware differences live only in `pipeline/configs/*.yaml`** (e.g., `local_m4.yaml`, `cloud_a100.yaml`). No `if torch.backends.mps.is_available()` branches scattered through `pipeline/` code. This keeps the local→cloud swap a config edit, not a code change.
+- **Never edit files inside `lmm-evqa/`** during the baseline phase. Treat it as a read-only vendored snapshot. All adapter/wrapper/ensemble/eval code lives in `pipeline/`. The invariant `git diff lmm-evqa/` should be empty until the extension phase. The single sanctioned future exception: a minimal documented patch to each upstream inference script that dumps the pre-regression hidden state to a `.pt` file (needed for the thesis's mid-fusion model). That patch must be flag-gated so the unmodified inference path still works, and noted in `lmm-evqa/UPSTREAM.md`.
+- **Subprocess boundary, not in-process import.** `pipeline/` invokes upstream scripts via `subprocess.run([...])` (typically `conda run -n <env> python ...`) and exchanges data through files. `pipeline/` must not `import videollama2` / `import qwen_vl` / `import torch` — its uv env stays light (`pandas`, `scipy`, `pyyaml`, `tqdm`). All heavy ML deps live in upstream's per-model conda envs. Reason: upstream pins CUDA-11.8 `torch==2.2.0` + Python 3.9/3.10, and VideoLLaMA2 vs Qwen2.5-VL have incompatible `transformers` pins — sharing an env is impossible.
+- **One conda env per upstream model.** E.g. `lmmevqa-videollama2` and `lmmevqa-qwen`. Their names live in `pipeline/configs/*.yaml`. Never merge them.
+- **Hardware differences live only in `pipeline/configs/*.yaml`** (e.g., `local.yaml`, `cloud_a100.yaml`). No `if torch.cuda.is_available()` / device-detection branches scattered through `pipeline/` code. This keeps the local→cloud swap a config edit, not a code change.
 - **LMM-EVQA is two independent models**, not a single fused pipeline. VideoLLaMA2 and Qwen2.5-VL are set up separately; their predictions are combined by our own `pipeline/ensemble.py` (simple averaging by default).
-- **Local-first, cloud-ready**: develop and smoke-test on M4 Air; expect to move heavy inference / any fine-tuning to cloud GPU (RunPod / Lambda / Vast.ai). Fine-tuning these 7B multimodal models on M4 is not feasible.
+- **Local-first, cloud-ready**: develop and smoke-test on the local Windows PC (specs TBD; `pipeline/configs/local.yaml` is a placeholder until they land). Expect to move heavy inference and any fine-tuning to a cloud GPU (RunPod / Lambda / Vast.ai) unless the local box has A100/H100-class VRAM.
 - **Evaluation metrics**: SROCC and PLCC (LMM-EVQA's challenge metrics) on the public SnapUGC subset. Thesis-target metrics (ECR, NAWP) come back into focus once the baseline is reproduced and we layer the Filipino creator features on top.
