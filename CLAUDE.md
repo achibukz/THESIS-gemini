@@ -16,7 +16,7 @@ This is a thesis research repository for **"To Predict Is To Believe: Integratin
 
 ## Repository Name
 
-The repo lives at `~/Code/GitHub/sfv-thesis` (formerly `THESIS-gemini`, then `THESIS`). If you see references to the old names anywhere, update them.
+The repo lives at `~/Code/GitHub/sfv-thesis`
 
 ## Repository Structure
 
