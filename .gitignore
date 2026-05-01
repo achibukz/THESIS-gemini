@@ -2,9 +2,25 @@
 /sensitive_data/
 /thesis/
 
+# --- Datasets & Model Weights (gitignored per CLAUDE.md) ---
+/data/
+/checkpoints/
+
 # --- Local Environment & IDE ---
 .DS_Store
 .vscode/
+.idea/
 .env
+
+# --- Python ---
 __pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 *.log
+
+# --- uv / virtualenvs ---
+.venv/
+pipeline/.venv/
