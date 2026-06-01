@@ -20,7 +20,8 @@ The repo lives at `~/Code/GitHub/sfv-thesis`
 
 ## Repository Structure
 
-- `thesis/` — LaTeX source files for each chapter (`chapter_1.tex`–`chapter_4.tex`, `abstract-english.tex`, `title_page.tex`)
+- `thesis/` — LaTeX source files for each chapter. Submission snapshots are nested under `MM/DD/YY/` (e.g. `thesis/6/1/26/` = June 1, 2026). The latest dated subfolder is the live working snapshot; older folders are frozen prior submissions. Each snapshot contains `chapter_1.tex`–`chapter_4.tex`, `abstract-english.tex`, `title_page.tex`, `myreferences.bib`, ethics checklist PDFs, and the `figures/` tree.
+- `docs/` — Per-deliverable execution plans (one self-contained brief per deliverable, dated `YYYY-MM-DD-<scope>-<topic>.md`). Treat these as living source-of-truth for in-flight thesis work. Format mirrors `docs/2026-06-01-THSST1-thesis-repo-update-plan.md` (Context → Anchor → What to Produce → Sources → Out of Scope → Format Conventions).
 - `sources/` — Academic references (`references.bib`, `rrl_matrix.csv`) and source PDFs in `sources/papers/`
 - `outputs/` — Generated artifacts (scripts, revised sections, model predictions)
 - `data_specs/`, `sensitive_data/` — Dataset specifications and participant data (treat as sensitive)
@@ -29,6 +30,42 @@ The repo lives at `~/Code/GitHub/sfv-thesis`
 - `data/`, `checkpoints/` — Gitignored. Hold downloaded SnapUGC subsets and fine-tuned model weights respectively.
 - `plan.md` — Active working plan for the LMM-EVQA baseline reproduction. Update this when scope changes.
 - `GEMINI.md` — Primary project context document; canonical source for terminology, architecture, and constraints.
+- `thesis-tasks.md` — Lightweight task tracker for thesis-scope work items (DT/DE/MT/MTR prefixes). Items get folded into `docs/` plans as they become active.
+
+## Syncing with School Context
+
+When the user asks to "update yourself," "sync context," "check schoolmem," or otherwise refresh thesis context, read the latest material under the Obsidian vault before answering:
+
+- `~/Documents/Obsidian/schoolMem/raw/AY2526-T3/THSST1/` — raw meeting minutes, session logs, and the task tracker.
+- `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/notes/` — dated session notes and meeting summaries.
+- `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/topics/` — durable topic pages (ECR, NAWP, pipeline architecture, dataset collection, etc.).
+- `~/Documents/Obsidian/schoolMem/output/` — generated briefs handed off to this repo (often the source of new `docs/` plans).
+
+Prefer the freshest meeting minutes when terminology, decisions, or deadlines conflict with what's in CLAUDE.md — then propose updating CLAUDE.md to match.
+
+## THSST1 Term Deadlines (AY2526-T3)
+
+Current term: AY2526-T3. THSST1 is the manuscript-prep term for the thesis.
+
+- **2026-07-06** — complete manuscript due (all chapters, including the prototype chapter for the Chrome extension). Missing this means non-endorsement for defense.
+- **2026-07-13** — endorsement-to-defense deadline.
+- **2026-07-20 – 2026-07-25** — defense week, face-to-face (DLSU local or Manila; hybrid Zoom only if a panel member cannot attend in person).
+- **Mandatory project sprints**: 2026-06-20, 2026-06-27 – 2026-06-28, 2026-07-18 – 2026-07-19. Attendance required for all group members.
+- **Big-group meetings** now run as an accountability circle: each group presents a 5–10 min progress report and commits to next-week goals.
+
+## Locked Decisions (from advising)
+
+These were approved by the adviser and should not be relitigated without explicit instruction:
+
+- **Data acquisition framing (approved 2026-05-26)**: the TikTok Analytics Exporter Chrome extension is a creator-side tool. It automates the creator's *right to access their own information* (TikTok Privacy Policy, "Your Rights and Choices"). The data flow is creator → creator; the study is the *recipient* of donated data, not the *acquirer*. This is the load-bearing claim for both Methodology §4.1 and the Ethics Review Form.
+- **Chrome extension is Step 2 of the data acquisition pipeline** — it replaces TikTok's built-in "Download your data" export in Methodology Ch 4.1.1. Pipeline order: Consent → Extension Export → Submission → Anonymization → Verification.
+- **No face blurring.** The model is not biometric/face-specific. The informed consent form will explicitly state that the creator's likeness may appear in training data; secondary subjects in the background are covered by the same consent. Drop any mention of automated face-detection/blurring from Ch 4.1.3.
+- **Synthetic / AI-generated datasets are rejected** — validation overhead outweighs benefit.
+- **Topic is locked.** No more pivots; refinement only.
+
+## Internal-Only Notes (do not cite in papers)
+
+- **Matthew Ong dataset** is a suggestion for *post-SnapUGC* cross-dataset validation. It is a proposal only. **Do not cite or reference in the manuscript, RRL, or ethics documents.**
 
 ## Technical Model Architecture
 
