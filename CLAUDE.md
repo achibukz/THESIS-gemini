@@ -87,6 +87,23 @@ Rules:
 - Keep terminology consistent with `GEMINI.md` (ECR, NAWP, exact LMM names)
 - Output revised LaTeX code only, no prose explanation
 
+## Revising Prose (thesis / drafts / docs)
+
+When the user asks to reword, rewrite, or replace any sentence or phrase in thesis prose (markdown drafts in `outputs/`, LaTeX in `thesis/`, or planning docs in `docs/`), **always present 3 distinct rewording options before editing**. Label them A, B, C with a short qualifier (e.g. "rights-first, plain" / "creator as the actor" / "shortest"). Wait for the user to pick before applying the edit. This applies even when the directive sounds like "just reword" — the user still wants choices.
+
+Exception: a pure typo, grammar fix, or numbering correction (e.g. §3.1 → §4.1) does not need options — apply directly.
+
+## Session Log
+
+A rolling `log.md` at the repo root records what each working session changed. **Update `log.md` after each major milestone** — a section accepted into LaTeX, a deliverable closed, a decision settled, a new file landed. Do not log every keystroke or in-flight wording iteration; only milestone-worthy events.
+
+Entry conventions:
+- Newest entry on top. Each entry has an H2 date header (`## YYYY-MM-DD`).
+- Sub-sections per entry: **Files touched** (path + one-line summary), **Decisions made** (option picks, settled questions), **Manuscript section status** (which §X.Y are drafted / accepted / pending), **Open items / next steps**.
+- Reference files by repo-relative path; reference picks by their A/B/C label and a short quote where useful.
+
+After updating `log.md`, cross-check the entry against `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/thesis/active-tasks.md`. For each logged milestone that matches an open task in that file, flip the checkbox in place (`- [ ]` → `- [x]`). Do not invent matches — if the wording is close but not a clear fit, leave the box and note it under "Open items / next steps" instead.
+
 ## Working with Scripts/Outputs
 
 For presentation scripts, target ~130–150 words/minute and include `[M:SS – M:SS]` time markers. Save results to `outputs/`.
