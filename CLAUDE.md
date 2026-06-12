@@ -34,7 +34,9 @@ The repo lives at `~/Code/GitHub/sfv-thesis`
 
 ## Syncing with School Context
 
-When the user asks to "update yourself," "sync context," "check schoolmem," or otherwise refresh thesis context, read the latest material under the Obsidian vault before answering:
+Check schoolMem **proactively, without being asked**, whenever the user asks about active tasks, deadlines, blockers, meeting decisions, or overall thesis status (e.g. "what are our active tasks"). The authoritative task tracker is `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/thesis/active-tasks.md` — prefer it over the repo's `thesis-tasks.md`, which is a coarser backlog. `blockers.md` and `decisions.md` live in the same folder.
+
+Additionally, when the user asks to "update yourself," "sync context," "check schoolmem," or otherwise refresh thesis context, read the latest material under the Obsidian vault before answering:
 
 - `~/Documents/Obsidian/schoolMem/raw/AY2526-T3/THSST1/` — raw meeting minutes, session logs, and the task tracker.
 - `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/notes/` — dated session notes and meeting summaries.
@@ -47,10 +49,13 @@ Prefer the freshest meeting minutes when terminology, decisions, or deadlines co
 
 Current term: AY2526-T3. THSST1 is the manuscript-prep term for the thesis.
 
+- **2026-06-23** — revised manuscript due for early ethics review (panelist pre-review).
 - **2026-07-06** — complete manuscript due (all chapters, including the prototype chapter for the Chrome extension). Missing this means non-endorsement for defense.
 - **2026-07-13** — endorsement-to-defense deadline.
+- **2026-07-14** — Thesis 1 submission: proposal defense documents.
+- **2026-07-18 – 2026-07-19** — mock defense.
 - **2026-07-20 – 2026-07-25** — defense week, face-to-face (DLSU local or Manila; hybrid Zoom only if a panel member cannot attend in person).
-- **Mandatory project sprints**: 2026-06-20, 2026-06-27 – 2026-06-28, 2026-07-18 – 2026-07-19. Attendance required for all group members.
+- **Mandatory project sprints**: 2026-06-20, 2026-06-27 – 2026-06-28. Attendance required for all group members.
 - **Big-group meetings** now run as an accountability circle: each group presents a 5–10 min progress report and commits to next-week goals.
 
 ## Locked Decisions (from advising)
@@ -69,10 +74,11 @@ These were approved by the adviser and should not be relitigated without explici
 
 ## Technical Model Architecture
 
-Three frozen LMM backbones used as feature extractors (no fine-tuning):
+Two frozen LMM backbones used as feature extractors (no fine-tuning):
 - **VideoLLaMA2** — spatiotemporal + auditory understanding
 - **Qwen2.5-VL** — visual-semantic reasoning
-- **InternVideo2** — visual dynamics analysis
+
+(**InternVideo2 was removed** from the architecture — decided June 2026. Methodology §4.2 still needs its branch edited out; do not reference InternVideo2 in new manuscript text.)
 
 Extracted embeddings are concatenated with structured metadata: follower count, account age, posting timestamps.
 
@@ -124,7 +130,7 @@ API keys and credentials live in `pipeline/.env` — never commit that file (cov
 ## Key Constraints (from GEMINI.md)
 
 - Dataset participants: Filipino micro-creators, 30–50 participants
-- Data source: voluntary MP4 donations + TikTok analytics exports
+- Data source: creator-donated TikTok analytics exports via the Chrome extension (two CSVs: engagement + follower history); researchers retrieve the corresponding videos from the public TikTok platform. **Direct MP4 donation was dropped 2026-06-09** — do not reintroduce it in methodology or ethics text.
 - Timeline: dataset building May–Aug 2026, model enhancement Aug–Dec 2026, evaluation Jan–Apr 2027
 - **Frozen-backbone variant** is an *optional* future direction (originally framed as a hard constraint due to compute limits). The current baseline-reproduction phase uses LMM-EVQA's published fine-tuned checkpoints as-is; full retraining is deferred to cloud.
 

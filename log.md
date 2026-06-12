@@ -4,6 +4,61 @@ Rolling record of what changed in this repo, who decided what, and what's left o
 
 ---
 
+## 2026-06-13
+
+### Files touched
+
+- `CLAUDE.md` — synced against schoolMem: proactive schoolMem check rule (task/deadline/status questions read `active-tasks.md` first); added 2026-06-23 early-ethics-review and 2026-07-14 proposal-docs deadlines; relabeled 07-18–19 as mock defense; data source updated to two-CSV extension export + researcher-side public video download (MP4 donation dropped 2026-06-09); InternVideo2 removed from architecture (two backbones remain).
+- `outputs/ethics-review.md`, `outputs/ethics-revision-instructions.md`, `outputs/ethics-revision-references.md` — renamed with `2026-06-09-` prefix to match dated convention; references in this log updated.
+
+### Decisions made
+
+- **InternVideo2 removal is decided**, not tentative — CLAUDE.md architecture section updated; §4.2 branch edit still pending in manuscript.
+- **schoolMem `active-tasks.md` is the authoritative task tracker** — repo `thesis-tasks.md` is a coarser backlog; also saved as persistent memory.
+
+### Manuscript section status
+
+- No manuscript text changed this session (repo/context maintenance only).
+
+### Open items / next steps
+
+- §4.2 — remove InternVideo2 branch in manuscript text (June task).
+- 2026-06-23 revised manuscript for early ethics review is the nearest deadline.
+- Active-tasks checkbox sync from 2026-06-09 sessions was never performed — "This Week" rows in schoolMem still unchecked; verify which are actually done before flipping.
+
+---
+
+## 2026-06-09 (session 2)
+
+### Files touched
+
+- `outputs/2026-06-09-ethics-review.md` — **new**. Full inconsistency audit across all four ethics forms (General Checklist, Review Form, Checklist A, Checklist G). 5 critical/major findings, 3 minor.
+- `outputs/2026-06-09-ethics-revision-instructions.md` — **new**. Prompt-style revision instructions for each Google Doc: Step 2 Chrome extension update, Step 3 Google Form update, Checklist A submission fix, adviser PhD credential, Esleta comma, Checklist G audio checkbox, Q1 clarification note, Q8 storage detail, Q9 kept NO (user decision), Checklist G withdrawal procedure filled in.
+- `outputs/2026-06-09-ethics-revision-references.md` — **new**. Separate prompt for the Review Form's Reference Document column: all 3.1.x section numbers → 4.1.x, "Table 3.1" → "Figure 4.1", "Table 3.2" → "Table 4.1", page numbers flagged for verification.
+- `docs/2026-06-01-THSST1-ethics-review-form.md` — **deleted** (outdated execution plan).
+- `outputs/revised_ethics.txt` — **deleted** (outdated draft).
+
+### Decisions made
+
+- **Q9 (future research reuse) stays NO** — user explicitly kept this; Checklist A's 3-year retention language is not treated as "making data available for future research" in the form's sense.
+- **Q6 (automated system) stays NO** — Chrome extension runs on the creator's own device/session; not classified as researcher-deployed automation.
+- **Q1 (publicly available) stays YES** — add clarification note that data is voluntarily donated from private creator dashboards, not scraped from public pages.
+- All changes applied to Google Docs by user in this session.
+
+### Manuscript section status
+
+- Ethics forms: revisions applied in Google Docs. PDFs in `thesis/6/1/26/` are the original submitted versions — do not overwrite unless re-exporting from Docs.
+- Page numbers in the Reference Document column are placeholders `[verify]` — need to be filled from the compiled manuscript before re-submission.
+
+### Open items / next steps
+
+- Fill in `[verify]` page numbers in the Reference Document column once the manuscript is compiled.
+- Re-export updated ethics form PDFs from Google Docs when ready and replace files in `thesis/` snapshot.
+- Informed Consent Form still open (not yet drafted or reviewed).
+- Duplicate lowercase PDFs (`checklist-A.pdf`, `general_checklist.pdf`) in `thesis/6/1/26/` — confirm whether these are identical to the named versions and delete if so.
+
+---
+
 ## 2026-06-09
 
 ### Files touched

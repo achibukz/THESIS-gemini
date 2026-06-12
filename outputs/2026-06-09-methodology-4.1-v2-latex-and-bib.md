@@ -1,6 +1,6 @@
-# §4.1 Building the Dataset — LaTeX Paste-Ready
+# §4.1 Building the Dataset — LaTeX Paste-Ready (v2)
 
-_Date: 2026-06-09. Mirrors `outputs/2026-06-01-methodology-3.1-building-the-dataset.md` converted to LaTeX for `thesis/<latest>/chapter_4.tex`. Drop the section block into the methodology chapter and append the new BibTeX entries to `myreferences.bib` (the two `li...` keys are already present)._
+_Date: 2026-06-09. Updated from v1 (`outputs/2026-06-09-methodology-4.1-latex-and-bib.md`): creators no longer donate raw MP4 files; researchers retrieve videos from TikTok's public platform using video IDs in the analytics CSV. Creators are required by the informed consent form to set their videos to public with downloads enabled. Pipeline expanded from five to six steps._
 
 ---
 
@@ -10,24 +10,24 @@ _Date: 2026-06-09. Mirrors `outputs/2026-06-01-methodology-3.1-building-the-data
 \section{Building the Dataset}
 \label{sec:dataset}
 
-The construction of the dataset addresses two gaps in existing short-form video (SFV) benchmarks. Content-only datasets such as SnapUGC lack the creator-specific and contextual metadata required for cold-start prediction \cite{li2024delving}. Automated scraping, the alternative most often used to enlarge a benchmark, produces inconsistent labels and cannot reach the backend retention metrics that platforms expose only to verified account holders \cite{li2025vquala}. This study works around both limits through a data donation approach in which Filipino micro-creators voluntarily submit their first-party analytics. The donation route gives the study verified ground-truth labels and avoids any access pattern that would conflict with platform terms.
+The construction of the dataset addresses two gaps in existing short-form video (SFV) benchmarks. Content-only datasets such as SnapUGC lack the creator-specific and contextual metadata required for cold-start prediction \cite{li2024delving}. Automated scraping, the alternative most often used to enlarge a benchmark, produces inconsistent labels and cannot reach the backend retention metrics that platforms expose only to verified account holders \cite{li2025vquala}. \hl{This study works around both limits through a data donation approach in which Filipino micro-creators voluntarily submit their first-party analytics.} The donation route gives the study verified ground-truth labels and avoids any access pattern that would conflict with platform terms.
 
 \subsection{Data Acquisition and Collection Procedure}
 \label{subsec:data_acq}
 
-Target participants are active TikTok content creators who maintain a professional or business account. Recruitment proceeds through a distributed Google Form link, with an ideal minimum of 30 to 50 Filipino micro-creators. After providing informed consent, each participant submits an analytics export covering their entire available video history, as described below. This per-participant density allows the model to analyze long-term creator patterns alongside specific video performance. The collection procedure runs in six stages summarized in Figure \ref{fig:data_acqui}.
+Target participants are active TikTok content creators who maintain a professional or business account. Recruitment proceeds through a distributed Google Form link, with an ideal minimum of 30 to 50 Filipino micro-creators. \ref{fig:data_acqui}.}
 
 \textbf{Step 1: Informed Consent.} The creator reviews the research objectives, the data handling policy, and the likeness clause covering donated footage before providing a digital signature. The consent form is attached as Appendix A and is signed before any donation step proceeds.
 
 \textbf{Step 2: Chrome Extension Export.} The participant installs the TikTok Analytics Exporter Chrome extension and authenticates through their own TikTok account. The extension reads the analytics that TikTok Studio already exposes to the logged-in creator and writes them to a CSV on the participant's local disk. It runs entirely inside the creator's authenticated browser session: no remote endpoint is contacted by the extension, no credentials are stored, and no viewer-level data is collected. Each participant exercises the access right granted to users under TikTok's Privacy Policy ``Your Rights and Choices'' clause \cite{tiktok_privacy_2026}; the extension only automates the export the creator is already entitled to perform manually.
 
-\textbf{Step 3: Submission.} The creator uploads the analytics CSV through a Google Form operated by the study. Before the upload completes, the creator must affirm a final consent statement on the form acknowledging the transfer.
+\textbf{Step 3: Submission.} \hl{The creator uploads the analytics CSV through a Google Form operated by the study.} Before the upload completes, the creator must affirm a final consent statement on the form acknowledging the transfer.
 
-\textbf{Step 4: Video Download.} The research team downloads each video from TikTok's public platform using the video IDs in the submitted CSV. This step is contingent on the creator having fulfilled the informed consent requirement to set their videos to public with downloads enabled before submission.
+\hl{\textbf{Step 4: Video Download.} The research team downloads each video from TikTok's public platform using the video IDs in the submitted CSV. This step is contingent on the creator having fulfilled the informed consent requirement to set their videos to public with downloads enabled before submission.}
 
-\textbf{Step 5: Anonymization.} Researchers strip identifying fields from the analytics CSV (account handle, profile name, contact email) and replace the creator handle with a randomized alphanumeric ID. The mapping between the original handle and the anonymized ID is held separately from the working dataset, under the safeguards stated later in this section.
+\hl{\textbf{Step 5: Anonymization.}} Researchers strip identifying fields from the analytics CSV (account handle, profile name, contact email) and replace the creator handle with a randomized alphanumeric ID. The mapping between the original handle and the anonymized ID is held separately from the working dataset, under the safeguards stated later in this section.
 
-\textbf{Step 6: Verification.} The post timestamps in the analytics export are cross-referenced with each retrieved MP4 to confirm that every row binds to the correct video file. The verification step pairs post date, post time, and reported duration to confirm the match.
+\hl{\textbf{Step 6: Verification.} The post timestamps in the analytics export are cross-referenced with each retrieved MP4 to confirm that every row binds to the correct video file. The verification step pairs post date, post time, and reported duration to confirm the match.}
 
 \subsection{Dataset Variables and Metrics}
 \label{subsec:dataset_vars}
@@ -36,22 +36,22 @@ The dataset integrates three feature layers that together frame the prediction p
 
 The analytics CSV produced by the Chrome extension export step is the canonical source for every non-content feature. Each row corresponds to one of the participating creator's videos and carries the post timestamp, video duration, view count, like count, share count, comment count, total watch time, average watch time (AWT), and the precomputed Normalized Average Watch Percentage (NAWP) value. The two project-target metrics are derived from this row directly: NAWP is read from the export, and Engagement Continuation Rate (ECR) is recovered from the retention curve TikTok exposes alongside the watch-time fields. Table \ref{tab:feature_list} lists the initial feature set; the full column schema is documented in \texttt{data\_specs/extension-csv-schema.md} and reflects the live column order written by the extension.
 
-While these are the primary variables for the initial model, the feature set is not closed. Some analytics exports expose additional fields, including audience-region breakdowns and traffic-source splits, that may support later experiments. The methodology allows the inclusion of such signals after the baseline is reproduced and only when the field is available consistently across donors.
+While these are the primary variables for the initial model, the feature set is not closed. \hl{Some analytics exports expose additional fields, including audience-region breakdowns and traffic-source splits, that may support later experiments.} The methodology allows the inclusion of such signals after the baseline is reproduced and only when the field is available consistently across donors.
 
 \subsection{Ethical Safeguards and Limitations}
 \label{subsec:ethics_limits}
 
 Ethical integrity is maintained through the procedures stated in the informed consent form (Appendix A) and the Ethics Review Form.
 
-\textbf{Public availability and downloads.} The informed consent form (Appendix A) includes a requirement that participants enable public visibility and TikTok's download permission on their posted videos before proceeding to the submission step. These settings must remain active through the completion of the video retrieval step.
+\hl{\textbf{Public availability and downloads.} The informed consent form (Appendix A) includes a requirement that participants enable public visibility and TikTok's download permission on their posted videos before proceeding to the submission step. These settings must remain active through the completion of the video retrieval step.}
 
-\textbf{Identity and likeness.} Creator handles are replaced with randomized identifiers at the anonymization step, and the original-to-anonymized mapping is held separately from the working dataset. The informed consent form covers the use of the creator's likeness as part of the retrieved frames; the proposed model performs engagement prediction and does not perform face recognition or other biometric inference. Secondary subjects appearing incidentally in the background of retrieved footage are covered by the same clause, since the creator confirms standing to authorize retrieval of the footage at the time of consent.
+\textbf{Identity and likeness.} Creator handles are replaced with randomized identifiers at the anonymization step, and the original-to-anonymized mapping is held separately from the working dataset. \hl{The informed consent form covers the use of the creator's likeness as part of the retrieved frames; the proposed model performs engagement prediction and does not perform face recognition or other biometric inference. Secondary subjects appearing incidentally in the background of retrieved footage are covered by the same clause, since the creator confirms standing to authorize retrieval of the footage at the time of consent.}
 
 \textbf{Data retention.} Non-anonymized donor information is held for a maximum of two years from the first publication of any result derived from the dataset or from project completion, whichever is later. Anonymized data is held for a maximum of three years on the same basis. After each retention window, the corresponding files are deleted, and the anonymization mapping table is deleted at the close of the two-year window so that no path remains from anonymized rows back to the original creator.
 
 \textbf{Withdrawal.} A participant may withdraw their donation at any time before the final model aggregation by contacting the proponent email listed in the consent form. After identity is verified through the original donation record, the participant's data is deleted across the ingestion portal, the working dataset, and the long-term archive.
 
-\textbf{TikTok platform compliance.} The analytics export step is initiated by the creator, performed inside the creator's own authenticated browser session, and limited to data the creator is already entitled to access \cite{tiktok_privacy_2026, tiktok_tos_2026}. The extension does not bypass any access control, does not store credentials, and does not contact any remote endpoint. Video retrieval in Step 4 operates on publicly accessible content that the creator has explicitly made downloadable, in compliance with TikTok's Terms of Service \cite{tiktok_tos_2026}. The study does not scrape, access non-public data, or bypass platform access controls at any stage.
+\hl{\textbf{TikTok platform compliance.} The analytics export step is initiated by the creator, performed inside the creator's own authenticated browser session, and limited to data the creator is already entitled to access \cite{tiktok_privacy_2026, tiktok_tos_2026}. The extension does not bypass any access control, does not store credentials, and does not contact any remote endpoint. Video retrieval in Step 4 operates on publicly accessible content that the creator has explicitly made downloadable, in compliance with TikTok's Terms of Service \cite{tiktok_tos_2026}. The study does not scrape, access non-public data, or bypass platform access controls at any stage.}
 ```
 
 ---
@@ -93,3 +93,4 @@ Append the two `tiktok_*` entries to `myreferences.bib`. The two `li...` keys ci
 2. **Table.** `\ref{tab:feature_list}` keeps the existing four-row summary (Raw MP4 File / Follower Count / Creator Age / Posting Time). No table edit required here.
 3. **Schema file.** The prose names `data_specs/extension-csv-schema.md`. If that file does not yet exist in the repo, generate it from the extension source before manuscript freeze so the reference resolves.
 4. **Appendix slot.** Prose refers to ``Appendix A'' for the consent form — confirm `appendix_A.tex` is the locked slot (not `appendix_B.tex`).
+5. **Informed consent form.** Add a clause requiring participants to enable public visibility and TikTok's download permission on their posted videos, and to maintain these settings through the video retrieval step (Step 4).
