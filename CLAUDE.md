@@ -63,7 +63,7 @@ Current term: AY2526-T3. THSST1 is the manuscript-prep term for the thesis.
 These were approved by the adviser and should not be relitigated without explicit instruction:
 
 - **Data acquisition framing (approved 2026-05-26)**: the TikTok Analytics Exporter Chrome extension is a creator-side tool. It automates the creator's *right to access their own information* (TikTok Privacy Policy, "Your Rights and Choices"). The data flow is creator → creator; the study is the *recipient* of donated data, not the *acquirer*. This is the load-bearing claim for both Methodology §4.1 and the Ethics Review Form.
-- **Chrome extension is Step 2 of the data acquisition pipeline** — it replaces TikTok's built-in "Download your data" export in Methodology Ch 4.1.1. Pipeline order: Consent → Extension Export → Submission → Anonymization → Verification.
+- **Chrome extension is Step 2 of the data acquisition pipeline** — it replaces TikTok's built-in "Download your data" export in Methodology Ch 4.1.1. Pipeline order (six steps as of the 2026-06-09 v2 revision): Consent → Extension Export → Submission (analytics CSV via Google Form) → Video Download (researchers retrieve videos from the public platform via video IDs) → Anonymization → Verification.
 - **No face blurring.** The model is not biometric/face-specific. The informed consent form will explicitly state that the creator's likeness may appear in training data; secondary subjects in the background are covered by the same consent. Drop any mention of automated face-detection/blurring from Ch 4.1.3.
 - **Synthetic / AI-generated datasets are rejected** — validation overhead outweighs benefit.
 - **Topic is locked.** No more pivots; refinement only.
