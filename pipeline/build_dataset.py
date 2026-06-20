@@ -9,11 +9,56 @@ See docs/2026-06-21-multi-creator-merge-design.md for the design spec.
 """
 from __future__ import annotations
 
+import argparse
 import re
+import sys
 from collections import defaultdict
 from pathlib import Path
 
 import pandas as pd
+
+
+REQUIRED_ROSTER_COLUMNS = [
+    "pseudonymous_id",
+    "creator_handle",
+    "consent_form_id",
+    "donation_date",
+]
+
+
+class RosterError(ValueError):
+    """Raised when the roster CSV is invalid."""
+
+
+def load_roster(path: Path) -> pd.DataFrame:
+    """Read and validate the roster CSV.
+
+    Required columns: pseudonymous_id, creator_handle, consent_form_id,
+    donation_date. All must be non-empty. pseudonymous_id and
+    creator_handle must each be unique.
+    """
+    df = pd.read_csv(path, dtype=str).fillna("")
+
+    missing = [c for c in REQUIRED_ROSTER_COLUMNS if c not in df.columns]
+    if missing:
+        raise RosterError(
+            f"Roster CSV is missing required column(s): {', '.join(missing)}"
+        )
+
+    for col in ("pseudonymous_id", "creator_handle"):
+        empties = df[df[col].str.strip() == ""]
+        if not empties.empty:
+            raise RosterError(
+                f"Roster CSV has {len(empties)} row(s) with empty {col}"
+            )
+        dupes = df[df.duplicated(subset=[col], keep=False)]
+        if not dupes.empty:
+            raise RosterError(
+                f"Roster CSV has duplicate {col} value(s): "
+                f"{sorted(set(dupes[col]))}"
+            )
+
+    return df
 
 
 # Anchored to match the extension's: tiktok_<kind>_<handle>_<YYYY-MM-DD>.csv
@@ -190,44 +235,51 @@ def build_merged_dataset(roster_path: Path, inputs_dir: Path) -> pd.DataFrame:
     return merged
 
 
-REQUIRED_ROSTER_COLUMNS = [
-    "pseudonymous_id",
-    "creator_handle",
-    "consent_form_id",
-    "donation_date",
-]
+def _warn_unmatched(merged: pd.DataFrame) -> None:
+    """Print a stderr summary of rows with NaN follower_count_at_post."""
+    missing_mask = merged["follower_count_at_post"].isna()
+    n_missing = int(missing_mask.sum())
+    if n_missing == 0:
+        return
+    n_total = len(merged)
+    print(
+        f"⚠  {n_missing}/{n_total} video(s) had no follower-history match "
+        f"on their post_date — follower_count_at_post is NaN.",
+        file=sys.stderr,
+    )
 
 
-class RosterError(ValueError):
-    """Raised when the roster CSV is invalid."""
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Build the conclusive multi-creator dataset."
+    )
+    parser.add_argument("--inputs", type=Path, required=True,
+                        help="Directory of per-creator CSVs.")
+    parser.add_argument("--roster", type=Path, required=True,
+                        help="Path to the roster CSV.")
+    parser.add_argument("--output", type=Path, required=True,
+                        help="Path for the merged dataset CSV.")
+    args = parser.parse_args(argv)
+
+    try:
+        merged = build_merged_dataset(args.roster, args.inputs)
+    except (RosterError, InputError, ParseError) as e:
+        print(f"✗ {e}", file=sys.stderr)
+        return 1
+
+    _warn_unmatched(merged)
+
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    merged.to_csv(args.output, index=False)
+
+    matched = int(merged["follower_count_at_post"].notna().sum())
+    creators = merged["pseudonymous_id"].nunique()
+    print(
+        f"✓ Wrote {len(merged)} video rows across {creators} creator(s) "
+        f"to {args.output} ({matched} matched, {len(merged) - matched} NaN)"
+    )
+    return 0
 
 
-def load_roster(path: Path) -> pd.DataFrame:
-    """Read and validate the roster CSV.
-
-    Required columns: pseudonymous_id, creator_handle, consent_form_id,
-    donation_date. All must be non-empty. pseudonymous_id and
-    creator_handle must each be unique.
-    """
-    df = pd.read_csv(path, dtype=str).fillna("")
-
-    missing = [c for c in REQUIRED_ROSTER_COLUMNS if c not in df.columns]
-    if missing:
-        raise RosterError(
-            f"Roster CSV is missing required column(s): {', '.join(missing)}"
-        )
-
-    for col in ("pseudonymous_id", "creator_handle"):
-        empties = df[df[col].str.strip() == ""]
-        if not empties.empty:
-            raise RosterError(
-                f"Roster CSV has {len(empties)} row(s) with empty {col}"
-            )
-        dupes = df[df.duplicated(subset=[col], keep=False)]
-        if not dupes.empty:
-            raise RosterError(
-                f"Roster CSV has duplicate {col} value(s): "
-                f"{sorted(set(dupes[col]))}"
-            )
-
-    return df
+if __name__ == "__main__":
+    raise SystemExit(main())

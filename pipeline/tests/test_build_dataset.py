@@ -1,6 +1,8 @@
 """Tests for build_dataset.py."""
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -289,3 +291,62 @@ def test_build_merged_dataset_nan_when_no_follower_match(
     df = build_merged_dataset(roster_path, tmp_path)
     assert len(df) == 1
     assert pd.isna(df.iloc[0]["follower_count_at_post"])
+
+
+def test_cli_writes_output_csv(
+        tmp_path, write_videos_csv, write_followers_csv, write_roster_csv):
+    write_videos_csv("alice", [
+        {"video_id": "v1", "post_date": "2026-06-01"},
+    ])
+    write_followers_csv("alice", [
+        {"date": "2026-06-01", "follower_count": "1000", "data_quality": ""},
+    ])
+    roster_path = write_roster_csv([
+        {"pseudonymous_id": "C001", "creator_handle": "alice",
+         "consent_form_id": "CF-001", "donation_date": "2026-06-15"},
+    ])
+    output = tmp_path / "out" / "dataset.csv"
+
+    result = subprocess.run(
+        [
+            sys.executable, "-m", "build_dataset",
+            "--inputs", str(tmp_path),
+            "--roster", str(roster_path),
+            "--output", str(output),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=str(Path(__file__).parent.parent),
+    )
+    assert result.returncode == 0, result.stderr
+    assert output.exists()
+    df = pd.read_csv(output)
+    assert df.iloc[0]["video_id"] == "v1"
+    assert df.iloc[0]["follower_count_at_post"] == 1000
+    assert "creator_handle" not in df.columns
+    assert "creator_uid" not in df.columns
+
+
+def test_cli_exits_nonzero_on_input_error(
+        tmp_path, write_videos_csv, write_roster_csv):
+    write_videos_csv("alice", [{"video_id": "v1", "post_date": "2026-06-01"}])
+    roster_path = write_roster_csv([
+        {"pseudonymous_id": "C001", "creator_handle": "alice",
+         "consent_form_id": "CF-001", "donation_date": "2026-06-15"},
+    ])
+    output = tmp_path / "out" / "dataset.csv"
+
+    result = subprocess.run(
+        [
+            sys.executable, "-m", "build_dataset",
+            "--inputs", str(tmp_path),
+            "--roster", str(roster_path),
+            "--output", str(output),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=str(Path(__file__).parent.parent),
+    )
+    assert result.returncode != 0
+    assert not output.exists()
+    assert "follower" in result.stderr.lower()
