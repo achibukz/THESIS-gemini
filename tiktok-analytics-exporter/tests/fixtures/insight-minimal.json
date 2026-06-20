@@ -1,0 +1,35 @@
+{
+  "data": {
+    "status": 0,
+    "video_info": {
+      "aweme_id": "7000000000000000001",
+      "create_time": 1750000000,
+      "desc": "test caption",
+      "duration": 29000,
+      "statistics": {
+        "digg_count": 12,
+        "comment_count": 2,
+        "share_count": 5
+      },
+      "author": {
+        "uid": "TEST_UID",
+        "unique_id": "test_user"
+      }
+    },
+    "video_retention_rate_realtime": {
+      "value": { "list": [{ "timestamp": "5000", "value": 0.46 }] }
+    },
+    "video_per_duration_realtime": { "value": { "value": 12.1 } },
+    "video_finish_rate_realtime": { "value": { "value": 0.1273 } },
+    "video_traffic_source_percent_realtime": {
+      "value": { "value": [
+        { "key": "For You", "value": 0.927 },
+        { "key": "Follow", "value": 0.004 },
+        { "key": "Personal Profile", "value": 0.034 },
+        { "key": "Search", "value": 0.003 }
+      ]}
+    },
+    "video_new_followers": { "value": { "value": 2 } },
+    "realtime_total_video_views": { "value": { "value": 744 } }
+  }
+}
