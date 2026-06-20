@@ -1,0 +1,29 @@
+{
+  "status_code": 0,
+  "status_msg": "",
+  "follower_num": { "status": 0, "value": 18 },
+  "follower_num_history": [
+    { "status": 2 },
+    { "status": 2 },
+    { "status": 0, "value": 0 },
+    { "status": 0, "value": 1 },
+    { "status": 0, "value": 3 },
+    { "status": 0, "value": 7 },
+    { "status": 0, "value": 12 },
+    { "status": 0, "value": 17 },
+    { "status": 0, "value": 18 },
+    { "status": 2 }
+  ],
+  "net_follower_history": [
+    { "status": 2 },
+    { "status": 2 },
+    { "status": 0, "value": 0 },
+    { "status": 0, "value": 1 },
+    { "status": 0, "value": 2 },
+    { "status": 0, "value": 4 },
+    { "status": 0, "value": 5 },
+    { "status": 0, "value": 5 },
+    { "status": 0, "value": 1 },
+    { "status": 2 }
+  ]
+}

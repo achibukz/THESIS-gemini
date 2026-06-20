@@ -181,3 +181,52 @@ export function mapIndexToDate(i, _length, anchorIndex, anchorDate) {
   const p = (n) => String(n).padStart(2, '0');
   return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}`;
 }
+
+export function parseFollowerHistoryResponse(json, now, opts) {
+  const { profile, limitDays } = opts;
+  if (!json) return { ok: false, reason: 'empty response' };
+  if (json.status_code !== 0 && json.status_code !== undefined) {
+    return { ok: false, reason: `status_code=${json.status_code}` };
+  }
+  const hist = json.follower_num_history;
+  if (!Array.isArray(hist) || hist.length === 0) {
+    return { ok: false, reason: 'missing follower_num_history' };
+  }
+  const netHist = Array.isArray(json.net_follower_history) ? json.net_follower_history : [];
+  const currentFollowerNum = json.follower_num?.value;
+
+  // Anchor: find last index where status:0
+  let anchorIndex = -1;
+  for (let i = hist.length - 1; i >= 0; i--) {
+    if (hist[i]?.status === 0) { anchorIndex = i; break; }
+  }
+  // If no status:0 anywhere, anchor last index to yesterday (degenerate but stable)
+  if (anchorIndex === -1) anchorIndex = hist.length - 1;
+
+  // Anchor date: yesterday if last status:0 value matches current follower_num, else today
+  const yesterday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1));
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const anchorMatches = hist[anchorIndex]?.value === currentFollowerNum;
+  const anchorDate = anchorMatches ? yesterday : today;
+
+  const allRows = [];
+  for (let i = 0; i < hist.length; i++) {
+    const date = mapIndexToDate(i, hist.length, anchorIndex, anchorDate);
+    const entry = hist[i] || {};
+    const netEntry = netHist[i] || {};
+    const isNoData = entry.status === 2;
+    allRows.push({
+      date,
+      follower_count: isNoData ? '' : (entry.value ?? ''),
+      daily_net: netEntry.status === 2 ? '' : (netEntry.value ?? ''),
+      creator_handle: profile?.creator_handle ?? '',
+      creator_uid: profile?.creator_uid ?? '',
+      data_quality: isNoData ? 'no_data' : ''
+    });
+  }
+
+  // Sort by date ascending so the most recent `limitDays` are the tail
+  allRows.sort((a, b) => (a.date < b.date ? -1 : 1));
+  const rows = limitDays > 0 ? allRows.slice(-limitDays) : allRows;
+  return { ok: true, rows };
+}
