@@ -14,11 +14,10 @@ import pytest
 
 VIDEO_COLUMNS = [
     "video_id", "post_date", "post_time", "caption", "duration_ms",
-    "views", "likes", "comments", "shares", "ECR", "avg_watch_time_s",
+    "comments", "shares", "ECR", "avg_watch_time_s",
     "NAWP", "watched_full_pct", "traffic_foryou_pct", "traffic_follow_pct",
     "traffic_profile_pct", "traffic_search_pct", "new_followers",
-    "creator_uid", "creator_handle", "follower_count",
-    "account_created_date", "data_quality",
+    "data_quality",
 ]
 
 FOLLOWER_COLUMNS = [
