@@ -155,3 +155,18 @@ function roundTo(n, decimals) {
   const k = 10 ** decimals;
   return Math.round(n * k) / k;
 }
+
+const DEFAULT_INSIGHT_BASE_FOR_FOLLOWERS =
+  'https://www.tiktok.com/aweme/v2/data/insight/?aid=1988&app_language=en&app_name=tiktok_creator_center&device_platform=web_pc&locale=en&channel=tiktok_web&os=mac';
+
+const FOLLOWER_TYPE_REQUESTS = [
+  { insigh_type: 'follower_num_history', days: 732, end_days: 1 },
+  { insigh_type: 'follower_num',         days: 732, end_days: 1 },
+  { insigh_type: 'net_follower_history', days: 732, end_days: 1 }
+];
+
+export function buildFollowerHistoryURL(template) {
+  const base = template || DEFAULT_INSIGHT_BASE_FOR_FOLLOWERS;
+  const sep = base.includes('?') ? '&' : '?';
+  return `${base}${sep}type_requests=${encodeURIComponent(JSON.stringify(FOLLOWER_TYPE_REQUESTS))}`;
+}
