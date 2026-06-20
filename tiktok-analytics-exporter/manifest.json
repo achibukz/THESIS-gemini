@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "My TikTok Analytics Backup",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Personal tool for TikTok creators to back up their own Studio analytics to a CSV file for offline review and self-tracking.",
   "permissions": ["storage", "tabs", "scripting", "downloads"],
   "host_permissions": ["*://*.tiktok.com/*"],
