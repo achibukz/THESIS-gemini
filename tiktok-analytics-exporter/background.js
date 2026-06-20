@@ -35,22 +35,36 @@ const INSIGHT_RETRY_DELAY_MS = 3000;
 
 function defaultState() {
   return {
-    phase: 'idle',
-    dateRange: null,
-    activeTabId: null,
-    videos: {},
+    // shared
     insightTemplate: null,
     profileTemplate: null,
     profile: null,
-    rows: [],
-    skipped: [],
-    progress: { current: 0, total: 0, message: '' },
-    startedAt: null,
-    finishedAt: null,
-    error: null,
     recentURLs: [],
     interceptCounts: { videoList: 0, insight: 0, profile: 0 },
-    lastVideoListSample: null
+    lastVideoListSample: null,
+
+    videoStep: {
+      phase: 'idle',
+      activeTabId: null,
+      dateRange: null,
+      videos: {},
+      rows: [],
+      skipped: [],
+      progress: { current: 0, total: 0, message: '' },
+      startedAt: null,
+      finishedAt: null,
+      error: null
+    },
+
+    followerStep: {
+      phase: 'idle',
+      activeTabId: null,
+      rows: [],
+      progress: { message: '' },
+      startedAt: null,
+      finishedAt: null,
+      error: null
+    }
   };
 }
 
@@ -105,12 +119,12 @@ async function handleMessage(msg, sender) {
     case 'reset-state':
       await resetState();
       return { ok: true };
-    case 'start-export':
-      return startExport(msg.dateRange, msg.tabId);
-    case 'cancel-export':
+    case 'start-video-export':
+      return startVideoExport(msg.dateRange, msg.tabId);
+    case 'cancel-video-export':
       await mutateState((s) => {
-        s.phase = 'cancelled';
-        s.progress.message = 'Cancelled by user';
+        s.videoStep.phase = 'cancelled';
+        s.videoStep.progress.message = 'Cancelled by user';
       });
       return { ok: true };
     case 'single-video-fetch':
@@ -183,8 +197,8 @@ async function ingestVideoList(json) {
     for (const raw of items) {
       const f = extractItemFields(raw);
       if (!f) continue;
-      const existing = s.videos[f.aweme_id] || {};
-      s.videos[f.aweme_id] = {
+      const existing = s.videoStep.videos[f.aweme_id] || {};
+      s.videoStep.videos[f.aweme_id] = {
         aweme_id: f.aweme_id,
         create_time: f.create_time ?? existing.create_time,
         desc: f.desc ?? existing.desc,
@@ -336,75 +350,75 @@ function buildInsightURL(template, awemeId) {
   return `${base}${sep}type_requests=${encodeURIComponent(JSON.stringify(typeRequests))}`;
 }
 
-async function startExport(dateRange, tabId) {
+async function startVideoExport(dateRange, tabId) {
   if (!tabId) return { ok: false, error: 'Missing tabId' };
 
   await mutateState((s) => {
-    s.phase = 'collecting-list';
-    s.dateRange = dateRange;
-    s.activeTabId = tabId;
-    s.rows = [];
-    s.skipped = [];
-    s.progress = { current: 0, total: 0, message: 'Scrolling to load video list...' };
-    s.startedAt = Date.now();
-    s.finishedAt = null;
-    s.error = null;
+    s.videoStep.phase = 'collecting-list';
+    s.videoStep.dateRange = dateRange;
+    s.videoStep.activeTabId = tabId;
+    s.videoStep.rows = [];
+    s.videoStep.skipped = [];
+    s.videoStep.progress = { current: 0, total: 0, message: 'Scrolling to load video list...' };
+    s.videoStep.startedAt = Date.now();
+    s.videoStep.finishedAt = null;
+    s.videoStep.error = null;
   });
 
-  runExport(tabId).catch(async (err) => {
+  runVideoExport(tabId).catch(async (err) => {
     console.error('[tt-exporter] export failed', err);
     await mutateState((s) => {
-      s.phase = 'error';
-      s.error = String(err?.message || err);
+      s.videoStep.phase = 'error';
+      s.videoStep.error = String(err?.message || err);
     });
   });
 
   return { ok: true };
 }
 
-async function runExport(tabId) {
+async function runVideoExport(tabId) {
   await sendToTab(tabId, { type: 'scroll-to-bottom' });
 
   let state = await getState();
-  if (state.phase === 'cancelled') return;
+  if (state.videoStep.phase === 'cancelled') return;
 
-  const filtered = filterVideosByDate(state.videos, state.dateRange);
+  const filtered = filterVideosByDate(state.videoStep.videos, state.videoStep.dateRange);
   if (filtered.length === 0) {
     await mutateState((s) => {
-      s.phase = 'done';
-      s.progress.message = 'No videos found in selected date range';
-      s.finishedAt = Date.now();
+      s.videoStep.phase = 'done';
+      s.videoStep.progress.message = 'No videos found in selected date range';
+      s.videoStep.finishedAt = Date.now();
     });
     return;
   }
 
   if (filtered.length > MAX_VIDEOS) {
     await mutateState((s) => {
-      s.progress.message = `Capped at ${MAX_VIDEOS} videos (had ${filtered.length})`;
+      s.videoStep.progress.message = `Capped at ${MAX_VIDEOS} videos (had ${filtered.length})`;
     });
     filtered.length = MAX_VIDEOS;
   }
 
   await mutateState((s) => {
-    s.phase = 'fetching-insights';
-    s.progress = { current: 0, total: filtered.length, message: 'Fetching insights...' };
+    s.videoStep.phase = 'fetching-insights';
+    s.videoStep.progress = { current: 0, total: filtered.length, message: 'Fetching insights...' };
   });
 
   for (let i = 0; i < filtered.length; i++) {
     state = await getState();
-    if (state.phase === 'cancelled') return;
+    if (state.videoStep.phase === 'cancelled') return;
 
     const video = filtered[i];
     const row = await fetchInsightRow(tabId, video, state.insightTemplate);
 
     await mutateState((s) => {
       if (row.ok) {
-        s.rows.push(row.row);
+        s.videoStep.rows.push(row.row);
       } else {
-        s.skipped.push({ aweme_id: video.aweme_id, reason: row.reason });
+        s.videoStep.skipped.push({ aweme_id: video.aweme_id, reason: row.reason });
       }
-      s.progress.current = i + 1;
-      s.progress.message = `Processed ${i + 1} of ${filtered.length}`;
+      s.videoStep.progress.current = i + 1;
+      s.videoStep.progress.message = `Processed ${i + 1} of ${filtered.length}`;
     });
 
     if (i < filtered.length - 1) {
@@ -414,8 +428,8 @@ async function runExport(tabId) {
   }
 
   await mutateState((s) => {
-    s.phase = 'fetching-profile';
-    s.progress.message = 'Fetching creator profile...';
+    s.videoStep.phase = 'fetching-profile';
+    s.videoStep.progress.message = 'Fetching creator profile...';
   });
 
   state = await getState();
@@ -432,16 +446,16 @@ async function runExport(tabId) {
   await mutateState((s) => {
     if (s.profile) {
       const created = formatUnixDate(s.profile.account_created_time);
-      for (const row of s.rows) {
+      for (const row of s.videoStep.rows) {
         row.follower_count = s.profile.follower_count ?? row.follower_count ?? '';
         row.account_created_date = created ?? row.account_created_date ?? '';
         if (!row.creator_uid) row.creator_uid = s.profile.creator_uid ?? '';
         if (!row.creator_handle) row.creator_handle = s.profile.creator_handle ?? '';
       }
     }
-    s.phase = 'done';
-    s.progress.message = `Done. ${s.rows.length} rows, ${s.skipped.length} skipped.`;
-    s.finishedAt = Date.now();
+    s.videoStep.phase = 'done';
+    s.videoStep.progress.message = `Done. ${s.videoStep.rows.length} rows, ${s.videoStep.skipped.length} skipped.`;
+    s.videoStep.finishedAt = Date.now();
   });
 }
 
