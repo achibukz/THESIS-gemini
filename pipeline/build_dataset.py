@@ -130,6 +130,24 @@ def discover_inputs(
     return result
 
 
+def load_and_stamp_videos(path: Path, pseudonymous_id: str) -> pd.DataFrame:
+    """Read a video CSV, stamp pseudonymous_id, drop handle+uid columns."""
+    df = pd.read_csv(path, dtype={"video_id": str}).fillna("")
+    df["pseudonymous_id"] = pseudonymous_id
+    return df.drop(columns=[c for c in ("creator_handle", "creator_uid")
+                            if c in df.columns])
+
+
+def load_and_stamp_followers(path: Path, pseudonymous_id: str) -> pd.DataFrame:
+    """Read a follower CSV, drop no_data rows, stamp pseudonymous_id,
+    drop handle+uid columns."""
+    df = pd.read_csv(path, dtype=str).fillna("")
+    df = df[df["data_quality"] != "no_data"].copy()
+    df["pseudonymous_id"] = pseudonymous_id
+    return df.drop(columns=[c for c in ("creator_handle", "creator_uid")
+                            if c in df.columns])
+
+
 REQUIRED_ROSTER_COLUMNS = [
     "pseudonymous_id",
     "creator_handle",

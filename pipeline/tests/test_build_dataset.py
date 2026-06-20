@@ -9,6 +9,7 @@ from build_dataset import (
     load_roster, RosterError,
     sanitize_handle, parse_filename, ParseError,
     discover_inputs, InputError,
+    load_and_stamp_videos, load_and_stamp_followers,
 )
 
 
@@ -185,3 +186,31 @@ def test_discover_inputs_collects_all_problems(
     assert "alice" in msg
     assert "ghost" in msg
     assert "C002" in msg or "bob" in msg
+
+
+def test_load_and_stamp_videos_strips_handle_and_uid(write_videos_csv):
+    path = write_videos_csv("alice", [
+        {"video_id": "v1", "post_date": "2026-06-01",
+         "creator_handle": "alice", "creator_uid": "U-123"},
+    ])
+    df = load_and_stamp_videos(path, "C001")
+    assert list(df["pseudonymous_id"]) == ["C001"]
+    assert "creator_handle" not in df.columns
+    assert "creator_uid" not in df.columns
+    assert df.iloc[0]["video_id"] == "v1"
+
+
+def test_load_and_stamp_followers_drops_no_data_rows(write_followers_csv):
+    path = write_followers_csv("alice", [
+        {"date": "2026-06-01", "follower_count": "100",
+         "data_quality": ""},
+        {"date": "2026-06-02", "follower_count": "",
+         "data_quality": "no_data"},
+        {"date": "2026-06-03", "follower_count": "102",
+         "data_quality": ""},
+    ])
+    df = load_and_stamp_followers(path, "C001")
+    assert list(df["pseudonymous_id"]) == ["C001", "C001"]
+    assert "creator_handle" not in df.columns
+    assert "creator_uid" not in df.columns
+    assert set(df["date"]) == {"2026-06-01", "2026-06-03"}
