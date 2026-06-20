@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Mockup B v2 — icons, no Single tab, Help tab</title>
+<style>
+  :root{
+    --card:#ffffff; --ink:#121417; --muted:#7a8089; --line:#ececef; --line2:#f3f4f6;
+    --red:#fe2c55; --cyan:#20d5ec; --dark:#16171b; --ok:#10a554; --ok-soft:#e8f8ef;
+    --amber:#b8791b; --amber-soft:#fff6e6; --amber-line:#f1ddb0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#1a1b20;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);display:flex;flex-direction:column;align-items:center;padding:28px 12px;gap:14px}
+  .frame-label{font-size:12px;color:#b9bcc4;max-width:400px;text-align:center;line-height:1.5}
+  .frame-label b{color:#fff}
+  .popup{width:372px;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  svg{display:block}
+  /* header */
+  .head{background:var(--dark);padding:16px 18px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:32px;height:32px;border-radius:9px;position:relative;background:#000;display:grid;place-items:center;color:#fff}
+  .logo:after{content:"";position:absolute;inset:0;border-radius:9px;box-shadow:1.5px 1.5px 0 var(--cyan),-1.5px -1.5px 0 var(--red);opacity:.9}
+  .brand h1{margin:0;font-size:15.5px;font-weight:700;color:#fff;letter-spacing:-.2px}
+  .brand p{margin:1px 0 0;font-size:11px;color:#9aa0aa}
+  .rights{margin:11px 0 0;font-size:10.5px;color:#aeb3bd;display:flex;gap:7px;align-items:center}
+  .rights .sh{color:var(--cyan);flex:none}
+  /* tabs */
+  .tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);padding:0 8px}
+  .tab{flex:1;border:none;background:transparent;font:inherit;font-size:12px;color:var(--muted);
+    padding:11px 4px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:600}
+  .tab.on{color:var(--ink);border-bottom-color:var(--red)}
+  .panel{display:none}.panel.on{display:block}
+  /* progress strip */
+  .strip{display:flex;align-items:center;justify-content:space-between;padding:12px 18px 4px}
+  .strip .dots{display:flex;align-items:center;gap:7px}
+  .strip .d{display:flex;align-items:center;gap:6px}
+  .strip .pip{width:20px;height:20px;border-radius:50%;background:#eceef1;color:var(--muted);
+    display:grid;place-items:center;font-size:10.5px;font-weight:700}
+  .strip .d.done .pip{background:var(--ok);color:#fff}
+  .strip .d .t{font-size:10.5px;color:var(--muted);font-weight:600}
+  .strip .d.done .t{color:var(--ink)}
+  .strip .seg{width:18px;height:2px;background:#eceef1;border-radius:2px}
+  .strip .count{font-size:10.5px;color:var(--muted)}
+  .strip .count b{color:var(--ink)}
+  .body{padding:8px 16px 16px}
+  /* module card */
+  .mod{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
+  .mod-h{display:flex;align-items:center;gap:10px;padding:12px 13px}
+  .mod-h .em{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none}
+  .mod.video .em{background:#ffe9ee;color:var(--red)}
+  .mod.fol .em{background:#e6fbfe;color:#0a9cb8}
+  .mod-h .tx{flex:1}
+  .mod-h b{font-size:12.5px;font-weight:650;display:block}
+  .mod-h small{font-size:10.5px;color:var(--muted)}
+  .pill{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:3px}
+  .pill.todo{background:#f2f3f5;color:var(--muted)}
+  .pill.ready{background:#e6fbfe;color:#0a8aa3}
+  .pill.done{background:var(--ok-soft);color:var(--ok)}
+  .mod-b{padding:0 13px 13px;border-top:1px solid var(--line)}
+  .guide{display:flex;gap:8px;align-items:flex-start;background:var(--amber-soft);border:1px solid var(--amber-line);
+    border-radius:9px;padding:9px 10px;margin:12px 0 10px}
+  .guide .ic{color:var(--amber);flex:none;margin-top:1px}
+  .guide p{margin:0;font-size:11px;color:#7c5410;line-height:1.5}
+  .guide code{background:#fff;border:1px solid var(--amber-line);border-radius:4px;padding:0 4px;font-size:10px}
+  .onpage{display:flex;gap:7px;align-items:center;background:var(--ok-soft);border:1px solid #c2ebd3;
+    border-radius:9px;padding:8px 10px;margin:12px 0 10px;font-size:11px;color:#106b3a}
+  .onpage .ic{color:var(--ok);flex:none}
+  .btn{width:100%;border:none;font:inherit;font-weight:700;font-size:12.5px;padding:11px;border-radius:9px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:7px}
+  .btn.open{background:#111;color:#fff}
+  .btn.open:hover{background:#000}
+  .btn.extract{background:var(--red);color:#fff}
+  .btn.extract:hover{background:#e0254a}
+  .hintline{font-size:10px;color:var(--muted);text-align:center;margin-top:7px}
+  .range{margin:0 0 10px}
+  .rl{font-size:10.5px;color:var(--muted);margin-bottom:6px;font-weight:600}
+  .dates{display:flex;gap:7px;margin-bottom:7px}
+  .dates input{flex:1;font:inherit;font-size:11px;padding:7px;border:1px solid var(--line);border-radius:7px}
+  .presets{display:flex;gap:5px;flex-wrap:wrap}
+  .presets button{font:inherit;font-size:10px;padding:4px 9px;border:1px solid var(--line);background:#fff;border-radius:7px;color:var(--muted);cursor:pointer}
+  .presets button.on{background:#111;border-color:#111;color:#fff}
+  .pbar{height:6px;background:#f0f1f3;border-radius:3px;overflow:hidden;margin:10px 0 6px}
+  .pbar > i{display:block;height:100%;width:0;background:var(--red);transition:width .25s}
+  .pmeta{font-size:10.5px;color:var(--muted);text-align:center}
+  .filerow{display:flex;align-items:center;justify-content:space-between;border:1px solid #c2ebd3;
+    background:var(--ok-soft);border-radius:9px;padding:10px 12px;margin-top:11px}
+  .filerow .l{display:flex;align-items:center;gap:9px}
+  .filerow .em2{color:var(--ok);flex:none}
+  .filerow b{font-size:11.5px}
+  .filerow small{display:block;font-size:10px;color:#3f8c5f}
+  .filerow .dl{font-size:11px;color:var(--ok);font-weight:700;cursor:pointer;background:none;border:none;display:flex;align-items:center;gap:4px}
+  .finish{display:none;background:var(--dark);border-radius:12px;padding:15px 14px;color:#fff;text-align:center}
+  .finish.show{display:block}
+  .finish .ic{color:var(--cyan);margin:0 auto 6px}
+  .finish b{font-size:13px;display:block;margin:0 0 3px}
+  .finish p{margin:0;font-size:11px;color:#b9bcc4;line-height:1.5}
+  .hide{display:none !important}
+  /* ===== HELP TAB ===== */
+  .help{padding:6px 0 2px}
+  .acc{border:1px solid var(--line);border-radius:11px;margin-bottom:9px;overflow:hidden}
+  .acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 13px}
+  .acc summary::-webkit-details-marker{display:none}
+  .acc .si{width:28px;height:28px;border-radius:8px;background:var(--line2);display:grid;place-items:center;color:#4b515a;flex:none}
+  .acc .st{flex:1;font-size:12.5px;font-weight:650}
+  .acc .chev{color:var(--muted);transition:transform .18s}
+  .acc[open] .chev{transform:rotate(90deg)}
+  .acc .ac-body{padding:0 13px 13px 51px}
+  .acc .ac-body p{margin:0 0 8px;font-size:11.5px;color:#4d535b;line-height:1.6}
+  .acc .ac-body p:last-child{margin-bottom:0}
+  .acc .ac-body b{color:var(--ink)}
+  .lnk{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:650;color:var(--red);
+    text-decoration:none;margin-top:2px}
+  .lnk.cyan{color:#0a9cb8}
+  .kv{font-size:11px;color:#4d535b;margin:2px 0}
+  .kv b{color:var(--ink)}
+  .help-foot{text-align:center;font-size:10px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+  <div class="frame-label"><b>Option B v2.</b> Minimal line-icons, <b>Single video tab removed</b> (just Export + Help). Help tab holds About / Privacy / Consent / Ethics / Contact. Click the tabs and the module buttons.</div>
+
+  <div class="popup">
+    <div class="head">
+      <div class="brand">
+        <div class="logo">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div>
+          <h1>Analytics Backup</h1>
+          <p>A companion for TikTok Studio</p>
+        </div>
+      </div>
+      <div class="rights">
+        <svg class="sh" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        Exports only the stats TikTok already lets you, the creator, access.
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" onclick="tab('export',this)">Export</button>
+      <button class="tab" onclick="tab('help',this)">Help</button>
+    </div>
+
+    <!-- ============ EXPORT PANEL ============ -->
+    <div class="panel on" id="p-export">
+      <div class="strip">
+        <div class="dots">
+          <div class="d" id="dot1"><span class="pip">1</span><span class="t">Video stats</span></div>
+          <span class="seg"></span>
+          <div class="d" id="dot2"><span class="pip">2</span><span class="t">Followers</span></div>
+        </div>
+        <div class="count"><b id="cnt">0</b> of 2 ready</div>
+      </div>
+
+      <div class="body">
+        <!-- MODULE 1 -->
+        <div class="mod video" id="mod1">
+          <div class="mod-h">
+            <div class="em">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"/><line x1="7" y1="21" x2="7" y2="12"/><line x1="12" y1="21" x2="12" y2="5"/><line x1="17" y1="21" x2="17" y2="9"/></svg>
+            </div>
+            <div class="tx"><b>Video performance</b><small>Per-video views, watch time &amp; retention</small></div>
+            <span class="pill todo" id="pill1">Step 1</span>
+          </div>
+          <div class="mod-b">
+            <div id="m1-idle">
+              <div class="guide">
+                <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+                <p>This data lives on your <b>Content</b> page. Open it first, then come back here.</p>
+              </div>
+              <button class="btn open" onclick="ready(1)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Open my Content page
+              </button>
+              <div class="hintline">&hellip;or switch to that tab yourself, then reopen this popup</div>
+            </div>
+            <div id="m1-ready" class="hide">
+              <div class="onpage"><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> You&rsquo;re on the Content page &mdash; ready to extract.</div>
+              <div class="range">
+                <div class="rl">Date range</div>
+                <div class="dates">
+                  <input type="date" value="2026-03-01" />
+                  <input type="date" value="2026-06-20" />
+                </div>
+                <div class="presets"><button>30d</button><button class="on">3 mo</button><button>1 yr</button><button>All</button></div>
+              </div>
+              <button class="btn extract" onclick="extract(1)">Extract video stats</button>
+            </div>
+            <div id="m1-run" class="hide">
+              <div class="pbar"><i id="bar1"></i></div>
+              <div class="pmeta" id="meta1">Reading video 18 of 47&hellip;</div>
+            </div>
+            <div id="m1-done" class="hide">
+              <div class="filerow">
+                <span class="l"><span class="em2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span><b>video_performance.csv</b><small>47 videos &middot; Mar 1 &ndash; Jun 20</small></span></span>
+                <button class="dl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODULE 2 -->
+        <div class="mod fol" id="mod2">
+          <div class="mod-h">
+            <div class="em">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="tx"><b>Follower history</b><small>Daily follower count &middot; last 365 days</small></div>
+            <span class="pill todo" id="pill2">Step 2</span>
+          </div>
+          <div class="mod-b">
+            <div id="m2-idle">
+              <div class="guide">
+                <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+                <p>Open <b>Analytics &rarr; Followers</b> and set the filter to <code>Last 365 days</code>. Then come back here.</p>
+              </div>
+              <button class="btn open" onclick="ready(2)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Open my Followers analytics
+              </button>
+              <div class="hintline">&hellip;or switch to that tab yourself, then reopen this popup</div>
+            </div>
+            <div id="m2-ready" class="hide">
+              <div class="onpage"><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> You&rsquo;re on the Followers page (365-day view) &mdash; ready to extract.</div>
+              <button class="btn extract" onclick="extract(2)">Extract follower history</button>
+            </div>
+            <div id="m2-run" class="hide">
+              <div class="pbar"><i id="bar2"></i></div>
+              <div class="pmeta" id="meta2">Reading daily follower counts&hellip;</div>
+            </div>
+            <div id="m2-done" class="hide">
+              <div class="filerow">
+                <span class="l"><span class="em2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span><b>follower_history.csv</b><small>365 days</small></span></span>
+                <button class="dl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="finish" id="finish">
+          <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <b>Both files are ready</b>
+          <p>Saved on your computer &mdash; nothing was uploaded. Send <b>both</b> to your researcher whenever you choose.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ HELP PANEL ============ -->
+    <div class="panel" id="p-help">
+      <div class="body help">
+
+        <details class="acc" open>
+          <summary>
+            <span class="si"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+            <span class="st">About this extension</span>
+            <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </summary>
+          <div class="ac-body">
+            <p>This tool helps Filipino creators in our thesis study keep a copy of <b>their own</b> TikTok Studio analytics as CSV files. It reads the same numbers you can already see in TikTok Studio and saves them locally &mdash; nothing more.</p>
+            <p>It produces two files: <b>video performance</b> and <b>follower history</b>.</p>
+          </div>
+        </details>
+
+        <details class="acc">
+          <summary>
+            <span class="si"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+            <span class="st">Your data &amp; privacy</span>
+            <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </summary>
+          <div class="ac-body">
+            <p><b>Runs entirely on your computer.</b> The files are saved to your Downloads folder. The extension never sends your data to us or anyone else.</p>
+            <p><b>You choose what to share.</b> Only the files you decide to send your researcher ever leave your device.</p>
+          </div>
+        </details>
+
+        <details class="acc">
+          <summary>
+            <span class="si"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>
+            <span class="st">Consent &amp; withdrawal</span>
+            <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </summary>
+          <div class="ac-body">
+            <p>You agreed to take part in this study by signing the informed consent form. Using this tool is voluntary.</p>
+            <p>You may <b>withdraw at any time</b> and ask that your shared files be deleted &mdash; no reason needed.</p>
+            <a class="lnk" href="#">View consent form
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          </div>
+        </details>
+
+        <details class="acc">
+          <summary>
+            <span class="si"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            <span class="st">Ethics &amp; approval</span>
+            <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </summary>
+          <div class="ac-body">
+            <p>This study was reviewed and approved by the <b>[University Research Ethics Committee]</b>. Your data is used only for academic research and is <b>anonymized</b> before analysis.</p>
+            <p class="kv">Ethics reference: <b>[REC-XXXX-XXXX]</b></p>
+            <p class="kv">Ethics contact: <b>[ethics@university.edu]</b></p>
+          </div>
+        </details>
+
+        <details class="acc">
+          <summary>
+            <span class="si"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>
+            <span class="st">Questions or help</span>
+            <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+          </summary>
+          <div class="ac-body">
+            <p>Reach the research team anytime:</p>
+            <p class="kv">Researcher: <b>[Name]</b></p>
+            <a class="lnk cyan" href="#">[researcher@university.edu]</a>
+          </div>
+        </details>
+
+        <div class="help-foot">v0.2.0 &middot; creator-side backup tool &middot; for thesis research use</div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  function tab(name, el){
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on')});
+    el.classList.add('on');
+    document.getElementById('p-export').classList.toggle('on', name==='export');
+    document.getElementById('p-help').classList.toggle('on', name==='help');
+  }
+  var doneCount = 0;
+  function show(id){document.getElementById(id).classList.remove('hide');}
+  function hide(id){document.getElementById(id).classList.add('hide');}
+  function ready(n){
+    hide('m'+n+'-idle'); show('m'+n+'-ready');
+    var p=document.getElementById('pill'+n); p.className='pill ready'; p.textContent='On page';
+  }
+  function extract(n){
+    hide('m'+n+'-ready'); show('m'+n+'-run');
+    var bar=document.getElementById('bar'+n), w=0;
+    var iv=setInterval(function(){
+      w+=Math.random()*22; if(w>=100){w=100;clearInterval(iv);finishMod(n);}
+      bar.style.width=w+'%';
+    },140);
+  }
+  function finishMod(n){
+    setTimeout(function(){
+      hide('m'+n+'-run'); show('m'+n+'-done');
+      var p=document.getElementById('pill'+n); p.className='pill done'; p.textContent='Done';
+      document.getElementById('dot'+n).classList.add('done');
+      doneCount++; document.getElementById('cnt').textContent=doneCount;
+      if(doneCount===2) document.getElementById('finish').classList.add('show');
+    },220);
+  }
+</script>
+</body>
+</html>

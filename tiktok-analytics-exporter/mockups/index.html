@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Extension redesign — mockup options</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#101114;color:#e8eaee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:28px 20px 48px}
+  h1{font-size:20px;margin:0 0 4px}
+  .lede{font-size:13px;color:#9aa0aa;max-width:760px;line-height:1.6;margin:0 0 6px}
+  .shared{font-size:12px;color:#c7ccd4;max-width:760px;line-height:1.6;margin:6px 0 22px;
+    background:#181a1f;border:1px solid #2a2d34;border-radius:10px;padding:12px 14px}
+  .shared b{color:#fff}
+  .grid{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+  .col{flex:1;min-width:392px;background:#16171b;border:1px solid #2a2d34;border-radius:14px;padding:14px}
+  .col h2{font-size:14px;margin:0 0 2px}
+  .col p{font-size:11.5px;color:#9aa0aa;line-height:1.55;margin:0 0 10px;min-height:48px}
+  .col .open{font-size:11px;color:#7fb2ff;text-decoration:none}
+  iframe{width:100%;height:660px;border:none;border-radius:10px;background:#fff;display:block}
+  .tagrow{display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap}
+  .tag{font-size:10px;color:#cdd2da;background:#23262d;border-radius:999px;padding:3px 9px}
+</style>
+</head>
+<body>
+  <h1>Chrome extension redesign &mdash; mockup options</h1>
+  <p class="lede">Three visual directions for the redesigned popup. Open each file directly to interact (tab/step switching and a simulated &ldquo;prepare files&rdquo; result work).</p>
+  <div class="shared">
+    <b>Shared across all three</b> (per your picks): full visual refresh &middot; <b>one unified export</b> that produces both CSVs (video performance + follower history, last 365 days) &middot; <b>rights-based framing</b> &mdash; &ldquo;your data, your copy,&rdquo; nothing uploaded, sharing is the creator&rsquo;s choice.
+  </div>
+
+  <div class="grid">
+    <div class="col">
+      <h2>A &mdash; Calm / Trust</h2>
+      <div class="tagrow"><span class="tag">privacy-first</span><span class="tag">not TikTok-branded</span><span class="tag">soft cards</span></div>
+      <p>Reads as a personal utility you own. Calm blue/teal palette, a reassurance banner up top. Quietly de-emphasizes that it touches TikTok at all.</p>
+      <a class="open" href="option-a-calm-trust.html" target="_blank">open A in new tab &#8599;</a>
+      <iframe src="option-a-calm-trust.html"></iframe>
+    </div>
+    <div class="col">
+      <h2>B &mdash; TikTok-native companion</h2>
+      <div class="tagrow"><span class="tag">red + cyan</span><span class="tag">dark header</span><span class="tag">dense</span></div>
+      <p>Leans into TikTok&rsquo;s own look so it feels like a sanctioned sidekick to TikTok Studio. Efficient, compact, checkmarked deliverable rows.</p>
+      <a class="open" href="option-b-tiktok-native.html" target="_blank">open B in new tab &#8599;</a>
+      <iframe src="option-b-tiktok-native.html"></iframe>
+    </div>
+    <div class="col">
+      <h2>C &mdash; Guided wizard</h2>
+      <div class="tagrow"><span class="tag">stepper</span><span class="tag">hand-holding</span><span class="tag">non-technical</span></div>
+      <p>Welcome &rarr; Choose &rarr; Done. One clear action per screen, heavy reassurance. Best fit for 30&ndash;50 non-technical participants. Click the buttons to advance.</p>
+      <a class="open" href="option-c-guided-wizard.html" target="_blank">open C in new tab &#8599;</a>
+      <iframe src="option-c-guided-wizard.html"></iframe>
+    </div>
+  </div>
+</body>
+</html>
