@@ -11,7 +11,7 @@
 
 This is fine for a single participant. The moment two participants' video CSVs are concatenated and joined against a combined follower file, every video on date *D* will match every follower row on date *D* — producing a cartesian blow-up and silently wrong `follower_count_at_post` values.
 
-**When you add a second creator:** either run the merge once per creator (recommended) or restore a creator identity column to the video CSV (e.g., derive it from the filename and pass it through `merge_csvs.py`).
+**When you add a second creator:** use `pipeline/build_dataset.py` (added 2026-06-21 on `feat/multi-creator-merge`). It pre-stamps `pseudonymous_id` from a roster CSV onto every video and follower row by parsing the filename slug, then joins on `(post_date, pseudonymous_id)` — the join key includes the creator, so the cartesian blow-up cannot happen. `merge_csvs.py` is unchanged and stays as the single-creator quick path.
 
 ---
 
