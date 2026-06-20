@@ -1,13 +1,10 @@
 const VIDEO_CSV_COLUMNS = [
-  'video_id','post_date','post_time','caption','duration_ms','views','likes','comments','shares',
+  'video_id','post_date','post_time','caption','duration_ms','comments','shares',
   'ECR','avg_watch_time_s','NAWP','watched_full_pct',
   'traffic_foryou_pct','traffic_follow_pct','traffic_profile_pct','traffic_search_pct',
-  'new_followers','creator_uid','creator_handle','follower_count','account_created_date','data_quality'
+  'new_followers','data_quality'
 ];
 const FOLLOWER_CSV_COLUMNS = ['date','follower_count','daily_net','creator_handle','creator_uid','data_quality'];
-
-const STUDIO_CONTENT_URL   = 'https://www.tiktok.com/tiktokstudio/content';
-const STUDIO_FOLLOWERS_URL = 'https://www.tiktok.com/tiktokstudio/analytics/followers?dateRange=%7B%22type%22%3A%22fixed%22%2C%22pastDay%22%3A365%7D';
 
 let activeTabId = null;
 let pollHandle = null;
@@ -67,12 +64,11 @@ function setDefaultDates() {
 function isoDate(d) { return d.toISOString().slice(0,10); }
 
 async function refresh() {
-  await checkPageStates();
   const res = await sendBg({ type: 'get-state' }).catch(() => null);
   const state = res?.state;
   if (!state) return;
-  renderModule1(state.videoStep);
-  renderModule2(state.followerStep);
+  if (state.videoStep) renderModule1(state.videoStep);
+  if (state.followerStep) renderModule2(state.followerStep);
   renderFooter(state);
   renderDebugCounters(state);
   renderDebugUrls(state);
@@ -97,18 +93,13 @@ function sendBg(msg) {
   }));
 }
 
-let m1OnPage = false;
-let m2OnPage = false;
-
 function wireModules() {
-  document.getElementById('m1-open').addEventListener('click', () => openTab(STUDIO_CONTENT_URL));
   document.getElementById('m1-extract').addEventListener('click', startVideoExtract);
   document.getElementById('m1-save').addEventListener('click', saveVideoCSV);
   document.getElementById('m1-cancel').addEventListener('click', () => sendBg({ type: 'cancel-video-export' }));
   for (const btn of document.querySelectorAll('#m1-ready .presets button')) {
     btn.addEventListener('click', () => applyPreset(btn));
   }
-  document.getElementById('m2-open').addEventListener('click', () => openTab(STUDIO_FOLLOWERS_URL));
   document.getElementById('m2-extract').addEventListener('click', startFollowerExtract);
   document.getElementById('m2-save').addEventListener('click', saveFollowerCSV);
   const dbgFilter = document.getElementById('dbg-filter');
@@ -118,14 +109,6 @@ function wireModules() {
     await sendBg({ type: 'reset-state' });
     await refresh();
   });
-}
-
-async function openTab(url) {
-  if (activeTabId) {
-    try { await chrome.tabs.update(activeTabId, { url, active: true }); return; }
-    catch (_e) { /* fall through to create */ }
-  }
-  await chrome.tabs.create({ url });
 }
 
 function applyPreset(btn) {
@@ -163,20 +146,12 @@ async function saveVideoCSV() {
   await downloadCSV(filename, buildCSV(rows, VIDEO_CSV_COLUMNS));
 }
 
-async function checkPageStates() {
-  if (!activeTabId) { m1OnPage = false; m2OnPage = false; return; }
-  const [a, b] = await Promise.all([
-    chrome.tabs.sendMessage(activeTabId, { type: 'is-studio-page' }).catch(() => null),
-    chrome.tabs.sendMessage(activeTabId, { type: 'is-followers-page' }).catch(() => null)
-  ]);
-  m1OnPage = !!a?.isStudio;
-  m2OnPage = !!b?.isFollowers;
-}
+
 
 function renderModule1(vs) {
   const phase = vs.phase;
-  showOnly('mod1', phaseToPaneM1(phase, m1OnPage));
-  setPill('pill1', phase, m1OnPage, 1);
+  showOnly('mod1', phaseToPaneM1(phase));
+  setPill('pill1', phase, 1);
   setDot('dot1', phase === 'done');
   if (phase === 'fetching-insights' || phase === 'collecting' || phase === 'fetching-profile') {
     const total = vs.progress?.total || 0;
@@ -193,12 +168,11 @@ function renderModule1(vs) {
   else hideErr('m1-error');
 }
 
-function phaseToPaneM1(phase, onPage) {
-  if (phase === 'idle' || phase === 'cancelled') return onPage ? 'ready' : 'idle';
+function phaseToPaneM1(phase) {
+  if (phase === 'idle' || phase === 'cancelled' || phase === 'error') return 'ready';
   if (phase === 'collecting' || phase === 'fetching-insights' || phase === 'fetching-profile') return 'run';
   if (phase === 'done')  return 'done';
-  if (phase === 'error') return onPage ? 'ready' : 'idle';
-  return 'idle';
+  return 'ready';
 }
 
 function phaseFallbackPct(phase) {
@@ -208,21 +182,20 @@ function phaseFallbackPct(phase) {
 }
 
 function showOnly(modId, paneName) {
-  for (const p of ['idle','ready','run','done']) {
+  for (const p of ['ready','run','done']) {
     const el = document.getElementById(`${modId === 'mod1' ? 'm1' : 'm2'}-${p}`);
     if (el) el.classList.toggle('hide', p !== paneName);
   }
 }
 
-function setPill(id, phase, onPage, n) {
+function setPill(id, phase, n) {
   const el = document.getElementById(id);
   if (!el) return;
   if (phase === 'done') { el.className = 'pill done'; el.textContent = 'Done'; return; }
   if (phase === 'collecting' || phase === 'fetching-insights' || phase === 'fetching-profile' || phase === 'fetching') {
     el.className = 'pill ready'; el.textContent = 'Running'; return;
   }
-  if (onPage) { el.className = 'pill ready'; el.textContent = 'On page'; return; }
-  el.className = 'pill todo'; el.textContent = `Step ${n}`;
+  el.className = 'pill ready'; el.textContent = 'Ready';
 }
 
 function setDot(id, done) {
@@ -248,8 +221,8 @@ function renderSkipped(list) {
 }
 
 function renderFooter(state) {
-  const done1 = state.videoStep.phase === 'done' ? 1 : 0;
-  const done2 = state.followerStep.phase === 'done' ? 1 : 0;
+  const done1 = state.videoStep?.phase === 'done' ? 1 : 0;
+  const done2 = state.followerStep?.phase === 'done' ? 1 : 0;
   setText('cnt', done1 + done2);
   document.getElementById('finish').classList.toggle('show', done1 + done2 === 2);
 }
@@ -277,8 +250,8 @@ function hideErr(id) { const el = document.getElementById(id); if (el) { el.text
 
 function renderModule2(fs) {
   const phase = fs.phase;
-  showOnly('mod2', phaseToPaneM2(phase, m2OnPage));
-  setPill('pill2', phase, m2OnPage, 2);
+  showOnly('mod2', phaseToPaneM2(phase));
+  setPill('pill2', phase, 2);
   setDot('dot2', phase === 'done');
   if (phase === 'fetching') {
     setBar('bar2', 50);
@@ -294,12 +267,11 @@ function renderModule2(fs) {
   else hideErr('m2-error');
 }
 
-function phaseToPaneM2(phase, onPage) {
-  if (phase === 'idle' || phase === 'cancelled') return onPage ? 'ready' : 'idle';
+function phaseToPaneM2(phase) {
+  if (phase === 'idle' || phase === 'cancelled' || phase === 'error') return 'ready';
   if (phase === 'fetching') return 'run';
   if (phase === 'done') return 'done';
-  if (phase === 'error') return onPage ? 'ready' : 'idle';
-  return 'idle';
+  return 'ready';
 }
 
 async function startFollowerExtract() {

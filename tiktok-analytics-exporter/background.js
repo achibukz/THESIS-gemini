@@ -1,7 +1,5 @@
 import {
   parseInsightResponse,
-  formatUnixDate,
-  formatUnixTime,
   buildFollowerHistoryURL,
   parseFollowerHistoryResponse
 } from './lib/parsers.js';
@@ -450,31 +448,6 @@ async function runVideoExport(tabId) {
   }
 
   await mutateState((s) => {
-    s.videoStep.phase = 'fetching-profile';
-    s.videoStep.progress.message = 'Fetching creator profile...';
-  });
-
-  state = await getState();
-  const profileURL = state.profileTemplate || DEFAULT_PROFILE_URL;
-  const profileRes = await sendToTab(tabId, { type: 'page-fetch', url: profileURL }).catch(
-    (err) => ({ ok: false, error: String(err) })
-  );
-  if (profileRes?.ok && profileRes.body) {
-    try {
-      await ingestProfile(JSON.parse(profileRes.body));
-    } catch (_e) { /* ignore */ }
-  }
-
-  await mutateState((s) => {
-    if (s.profile) {
-      const created = formatUnixDate(s.profile.account_created_time);
-      for (const row of s.videoStep.rows) {
-        row.follower_count = s.profile.follower_count ?? row.follower_count ?? '';
-        row.account_created_date = created ?? row.account_created_date ?? '';
-        if (!row.creator_uid) row.creator_uid = s.profile.creator_uid ?? '';
-        if (!row.creator_handle) row.creator_handle = s.profile.creator_handle ?? '';
-      }
-    }
     s.videoStep.phase = 'done';
     s.videoStep.progress.message = `Done. ${s.videoStep.rows.length} rows, ${s.videoStep.skipped.length} skipped.`;
     s.videoStep.finishedAt = Date.now();

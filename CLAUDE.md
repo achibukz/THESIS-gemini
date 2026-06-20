@@ -26,15 +26,17 @@ The repo lives at `~/Code/GitHub/sfv-thesis`
 - `outputs/` — Generated artifacts (scripts, revised sections, model predictions)
 - `data_specs/`, `sensitive_data/` — Dataset specifications and participant data (treat as sensitive)
 - `lmm-evqa/` — **Vendored upstream** code from https://github.com/sunwei925/LMM-EVQA. Treated as read-only; never edit files inside this directory.
-- `pipeline/` — Our `uv`-managed Python project. All local code lives here: adapters, configs, dataset loaders, ensemble, evaluation, and the `.venv`. This is the main project folder.
+- `pipeline/` — Our `uv`-managed Python project. All local code will live here: adapters, configs, dataset loaders, ensemble, evaluation, and the `.venv`. **Currently a scaffold** (hello-world `main.py` only) — the Baseline Reproduction rules below describe the planned architecture, not implemented code. `pipeline/configs/*.yaml` does not exist yet.
+- `tiktok-analytics-exporter/` — The TikTok Analytics Exporter Chrome extension source (manifest, content/injected scripts, popup). This is Step 2 of the data acquisition pipeline. `chromeextension.md` at repo root is its plan/spec document.
 - `data/`, `checkpoints/` — Gitignored. Hold downloaded SnapUGC subsets and fine-tuned model weights respectively.
 - `plan.md` — Active working plan for the LMM-EVQA baseline reproduction. Update this when scope changes.
-- `GEMINI.md` — Primary project context document; canonical source for terminology, architecture, and constraints.
-- `thesis-tasks.md` — Lightweight task tracker for thesis-scope work items (DT/DE/MT/MTR prefixes). Items get folded into `docs/` plans as they become active.
+- `GEMINI.md` — Primary project context document; canonical source for terminology, architecture, and constraints. Keep it in sync with the Locked Decisions in this file — if they conflict, the Locked Decisions win and GEMINI.md must be updated.
+
+There is **no task tracker in this repo** — the authoritative tracker is schoolMem's `active-tasks.md` (see "Syncing with School Context"). The former `thesis-tasks.md` was removed 2026-06-13.
 
 ## Syncing with School Context
 
-Check schoolMem **proactively, without being asked**, whenever the user asks about active tasks, deadlines, blockers, meeting decisions, or overall thesis status (e.g. "what are our active tasks"). The authoritative task tracker is `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/thesis/active-tasks.md` — prefer it over the repo's `thesis-tasks.md`, which is a coarser backlog. `blockers.md` and `decisions.md` live in the same folder.
+Check schoolMem **proactively, without being asked**, whenever the user asks about active tasks, deadlines, blockers, meeting decisions, or overall thesis status (e.g. "what are our active tasks"). The authoritative task tracker is `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/thesis/active-tasks.md` — it is the **only** task tracker (the repo-local `thesis-tasks.md` was removed 2026-06-13). `blockers.md` and `decisions.md` live in the same folder.
 
 Additionally, when the user asks to "update yourself," "sync context," "check schoolmem," or otherwise refresh thesis context, read the latest material under the Obsidian vault before answering:
 
@@ -67,6 +69,8 @@ These were approved by the adviser and should not be relitigated without explici
 - **No face blurring.** The model is not biometric/face-specific. The informed consent form will explicitly state that the creator's likeness may appear in training data; secondary subjects in the background are covered by the same consent. Drop any mention of automated face-detection/blurring from Ch 4.1.3.
 - **Synthetic / AI-generated datasets are rejected** — validation overhead outweighs benefit.
 - **Topic is locked.** No more pivots; refinement only.
+
+**Stale-term sweep rule:** whenever a decision is locked, reversed, or a term/component is dropped (e.g. InternVideo2, MP4 donation), grep the whole repo (and GEMINI.md) for the old term and list every hit to the user — don't fix only the file at hand. This is how MP4/InternVideo2 references survived in GEMINI.md, `thesis-tasks.md`, and the ethics-revision instructions after the decisions that removed them.
 
 ## Internal-Only Notes (do not cite in papers)
 
@@ -108,7 +112,7 @@ Entry conventions:
 - Sub-sections per entry: **Files touched** (path + one-line summary), **Decisions made** (option picks, settled questions), **Manuscript section status** (which §X.Y are drafted / accepted / pending), **Open items / next steps**.
 - Reference files by repo-relative path; reference picks by their A/B/C label and a short quote where useful.
 
-After updating `log.md`, cross-check the entry against `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/thesis/active-tasks.md`. For each logged milestone that matches an open task in that file, flip the checkbox in place (`- [ ]` → `- [x]`). Do not invent matches — if the wording is close but not a clear fit, leave the box and note it under "Open items / next steps" instead.
+After updating `log.md`, cross-check the entry against `~/Documents/Obsidian/schoolMem/wiki/AY2526-T3/THSST1-Thesis-in-Software-Technology-1/thesis/active-tasks.md`. Add a **"Suggested checkbox flips"** list to the log entry: for each logged milestone that plausibly closes an open task in that file, quote the task row and say why. Present the list to the user and flip only the boxes they confirm (`- [ ]` → `- [x]`). Never flip silently; never skip the suggestion step just because no match is exact.
 
 ## Working with Scripts/Outputs
 

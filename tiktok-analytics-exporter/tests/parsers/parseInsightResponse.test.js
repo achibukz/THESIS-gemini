@@ -14,8 +14,6 @@ describe('parseInsightResponse', () => {
     assertRowEquals(result.row, {
       video_id: '7000000000000000001',
       duration_ms: 29000,
-      views: 744,
-      likes: 12,
       comments: 2,
       shares: 5,
       ECR: 0.46,
@@ -26,8 +24,6 @@ describe('parseInsightResponse', () => {
       traffic_profile_pct: 0.034,
       traffic_search_pct: 0.003,
       new_followers: 2,
-      creator_uid: 'TEST_UID',
-      creator_handle: 'test_user',
       data_quality: ''
     });
     assert.equal(result.row.NAWP, 0.417241);

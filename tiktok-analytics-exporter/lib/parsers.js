@@ -15,7 +15,6 @@ export function parseInsightResponse(json, video) {
   const finishRate = findInsight(data, 'video_finish_rate_realtime');
   const trafficSource = findInsight(data, 'video_traffic_source_percent_realtime');
   const newFollowers = findInsight(data, 'video_new_followers');
-  const totalViews = findInsight(data, 'realtime_total_video_views');
 
   const ecr = readRetentionAt(retention, '5000');
   if (ecr == null && statusFlag !== 2) dataQualityIssues.push('missing_ecr');
@@ -33,8 +32,6 @@ export function parseInsightResponse(json, video) {
     post_time: formatUnixTime(createTs),
     caption: videoInfo?.desc ?? video.desc ?? '',
     duration_ms: durationMs ?? video.duration_ms ?? '',
-    views: readNumericValue(totalViews) ?? stats.play_count ?? '',
-    likes: stats.digg_count ?? video.digg_count ?? '',
     comments: stats.comment_count ?? video.comment_count ?? '',
     shares: stats.share_count ?? video.share_count ?? '',
     ECR: ecr ?? '',
@@ -46,10 +43,6 @@ export function parseInsightResponse(json, video) {
     traffic_profile_pct: traffic.profile ?? '',
     traffic_search_pct: traffic.search ?? '',
     new_followers: readNumericValue(newFollowers) ?? '',
-    creator_uid: videoInfo?.author?.uid ?? '',
-    creator_handle: videoInfo?.author?.unique_id ?? '',
-    follower_count: '',
-    account_created_date: '',
     data_quality: dataQualityIssues.join('|')
   };
   return { ok: true, row };

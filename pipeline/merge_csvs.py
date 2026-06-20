@@ -48,10 +48,9 @@ def load_videos(paths: list[Path]) -> pd.DataFrame:
     """Read and concatenate one or more video-analytics CSVs."""
     frames = []
     for p in paths:
-        df = pd.read_csv(p, dtype={"video_id": str, "creator_uid": str})
+        df = pd.read_csv(p, dtype={"video_id": str})
         frames.append(df)
     combined = pd.concat(frames, ignore_index=True)
-    # Normalise the join key
     combined["post_date"] = pd.to_datetime(combined["post_date"], format="%Y-%m-%d")
     return combined
 
