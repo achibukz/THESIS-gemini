@@ -9,9 +9,42 @@ See docs/2026-06-21-multi-creator-merge-design.md for the design spec.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pandas as pd
+
+
+# Anchored to match the extension's: tiktok_<kind>_<handle>_<YYYY-MM-DD>.csv
+# Handle slug is everything between the kind and the trailing date.
+_FILENAME_RE = re.compile(
+    r"^tiktok_(?P<kind>videos|followers)_(?P<slug>.+)_(?P<date>\d{4}-\d{2}-\d{2})\.csv$"
+)
+
+
+class ParseError(ValueError):
+    """Raised when a filename does not match the expected pattern."""
+
+
+def sanitize_handle(handle: str) -> str:
+    """Apply the same sanitization the Chrome extension applies.
+
+    See tiktok-analytics-exporter/popup.js:sanitize — replaces every
+    character outside [a-zA-Z0-9_-] with underscore, truncates to 64.
+    """
+    return re.sub(r"[^a-zA-Z0-9_-]", "_", handle)[:64]
+
+
+def parse_filename(path: Path) -> tuple[str, str, str]:
+    """Return (kind, slug, date) parsed from a CSV filename.
+
+    Raises ParseError if the filename does not match
+    tiktok_{videos|followers}_<slug>_<YYYY-MM-DD>.csv.
+    """
+    m = _FILENAME_RE.match(path.name)
+    if not m:
+        raise ParseError(f"Filename does not match expected pattern: {path.name}")
+    return m.group("kind"), m.group("slug"), m.group("date")
 
 
 REQUIRED_ROSTER_COLUMNS = [
