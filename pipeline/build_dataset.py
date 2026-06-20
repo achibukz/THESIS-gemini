@@ -148,6 +148,48 @@ def load_and_stamp_followers(path: Path, pseudonymous_id: str) -> pd.DataFrame:
                             if c in df.columns])
 
 
+def build_merged_dataset(roster_path: Path, inputs_dir: Path) -> pd.DataFrame:
+    """End-to-end merge: roster + per-creator CSVs → one dataset.
+
+    Returns the merged DataFrame. Does not write to disk — the CLI
+    main() handles I/O.
+    """
+    roster = load_roster(roster_path)
+    inputs = discover_inputs(roster, inputs_dir)
+
+    video_frames = [
+        load_and_stamp_videos(paths["videos"], pseudo_id)
+        for pseudo_id, paths in inputs.items()
+    ]
+    follower_frames = [
+        load_and_stamp_followers(paths["followers"], pseudo_id)
+        for pseudo_id, paths in inputs.items()
+    ]
+
+    videos_all = pd.concat(video_frames, ignore_index=True)
+    followers_all = pd.concat(follower_frames, ignore_index=True)
+
+    followers_all["follower_count"] = pd.to_numeric(
+        followers_all["follower_count"], errors="coerce"
+    )
+
+    follower_lookup = followers_all[
+        ["date", "pseudonymous_id", "follower_count"]
+    ].rename(columns={"follower_count": "follower_count_at_post"})
+
+    merged = videos_all.merge(
+        follower_lookup,
+        left_on=["post_date", "pseudonymous_id"],
+        right_on=["date", "pseudonymous_id"],
+        how="left",
+    ).drop(columns=["date"])
+
+    roster_cols = roster.drop(columns=["creator_handle"])
+    merged = merged.merge(roster_cols, on="pseudonymous_id", how="left")
+
+    return merged
+
+
 REQUIRED_ROSTER_COLUMNS = [
     "pseudonymous_id",
     "creator_handle",

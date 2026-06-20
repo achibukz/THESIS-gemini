@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from build_dataset import (
@@ -10,6 +11,7 @@ from build_dataset import (
     sanitize_handle, parse_filename, ParseError,
     discover_inputs, InputError,
     load_and_stamp_videos, load_and_stamp_followers,
+    build_merged_dataset,
 )
 
 
@@ -214,3 +216,76 @@ def test_load_and_stamp_followers_drops_no_data_rows(write_followers_csv):
     assert "creator_handle" not in df.columns
     assert "creator_uid" not in df.columns
     assert set(df["date"]) == {"2026-06-01", "2026-06-03"}
+
+
+def test_build_merged_dataset_happy_path(
+        tmp_path, write_videos_csv, write_followers_csv, write_roster_csv):
+    write_videos_csv("alice", [
+        {"video_id": "v1", "post_date": "2026-06-01"},
+    ])
+    write_followers_csv("alice", [
+        {"date": "2026-06-01", "follower_count": "1000", "data_quality": ""},
+    ])
+    roster_path = write_roster_csv([
+        {"pseudonymous_id": "C001", "creator_handle": "alice",
+         "consent_form_id": "CF-001", "donation_date": "2026-06-15"},
+    ])
+    df = build_merged_dataset(roster_path, tmp_path)
+    assert len(df) == 1
+    assert df.iloc[0]["follower_count_at_post"] == 1000
+    assert df.iloc[0]["pseudonymous_id"] == "C001"
+    assert df.iloc[0]["consent_form_id"] == "CF-001"
+    assert "creator_handle" not in df.columns
+    assert "creator_uid" not in df.columns
+
+
+def test_build_merged_dataset_cartesian_regression_guard(
+        tmp_path, write_videos_csv, write_followers_csv, write_roster_csv):
+    """The bug from Caveat #1: two creators posting on the same date
+    must not cross-match each other's follower counts.
+    """
+    write_videos_csv("alice", [
+        {"video_id": "v_alice", "post_date": "2026-06-01"},
+    ])
+    write_videos_csv("bob", [
+        {"video_id": "v_bob", "post_date": "2026-06-01"},
+    ])
+    write_followers_csv("alice", [
+        {"date": "2026-06-01", "follower_count": "1000",
+         "data_quality": ""},
+    ])
+    write_followers_csv("bob", [
+        {"date": "2026-06-01", "follower_count": "5000",
+         "data_quality": ""},
+    ])
+    roster_path = write_roster_csv([
+        {"pseudonymous_id": "C001", "creator_handle": "alice",
+         "consent_form_id": "CF-001", "donation_date": "2026-06-15"},
+        {"pseudonymous_id": "C002", "creator_handle": "bob",
+         "consent_form_id": "CF-002", "donation_date": "2026-06-15"},
+    ])
+    df = build_merged_dataset(roster_path, tmp_path)
+
+    assert len(df) == 2
+
+    alice_row = df[df["video_id"] == "v_alice"].iloc[0]
+    bob_row = df[df["video_id"] == "v_bob"].iloc[0]
+    assert alice_row["follower_count_at_post"] == 1000
+    assert bob_row["follower_count_at_post"] == 5000
+
+
+def test_build_merged_dataset_nan_when_no_follower_match(
+        tmp_path, write_videos_csv, write_followers_csv, write_roster_csv):
+    write_videos_csv("alice", [
+        {"video_id": "v1", "post_date": "2025-12-01"},
+    ])
+    write_followers_csv("alice", [
+        {"date": "2026-06-01", "follower_count": "1000", "data_quality": ""},
+    ])
+    roster_path = write_roster_csv([
+        {"pseudonymous_id": "C001", "creator_handle": "alice",
+         "consent_form_id": "CF-001", "donation_date": "2026-06-15"},
+    ])
+    df = build_merged_dataset(roster_path, tmp_path)
+    assert len(df) == 1
+    assert pd.isna(df.iloc[0]["follower_count_at_post"])
