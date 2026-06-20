@@ -1,4 +1,10 @@
-import { parseInsightResponse, formatUnixDate, formatUnixTime } from './lib/parsers.js';
+import {
+  parseInsightResponse,
+  formatUnixDate,
+  formatUnixTime,
+  buildFollowerHistoryURL,
+  parseFollowerHistoryResponse
+} from './lib/parsers.js';
 
 const VIDEO_LIST_RES = [
   /\/tiktok\/creator\/manage\/item_list\//i,
@@ -125,6 +131,24 @@ async function handleMessage(msg, sender) {
       await mutateState((s) => {
         s.videoStep.phase = 'cancelled';
         s.videoStep.progress.message = 'Cancelled by user';
+      });
+      return { ok: true };
+    case 'start-follower-export':
+      return startFollowerExport(msg.tabId);
+    case 'cancel-follower-export':
+      await mutateState((s) => {
+        s.followerStep.phase = 'cancelled';
+        s.followerStep.progress.message = 'Cancelled by user';
+      });
+      return { ok: true };
+    case 'reset-follower-step':
+      await mutateState((s) => {
+        s.followerStep = defaultState().followerStep;
+      });
+      return { ok: true };
+    case 'reset-video-step':
+      await mutateState((s) => {
+        s.videoStep = defaultState().videoStep;
       });
       return { ok: true };
     default:
@@ -510,6 +534,86 @@ async function fetchInsightRow(tabId, video, template) {
   }
 
   return parseInsightResponse(json, video);
+}
+
+async function startFollowerExport(tabId) {
+  if (!tabId) return { ok: false, error: 'Missing tabId' };
+
+  await mutateState((s) => {
+    s.followerStep.phase = 'fetching';
+    s.followerStep.activeTabId = tabId;
+    s.followerStep.rows = [];
+    s.followerStep.progress = { message: 'Fetching follower history…' };
+    s.followerStep.startedAt = Date.now();
+    s.followerStep.finishedAt = null;
+    s.followerStep.error = null;
+  });
+
+  runFollowerExport(tabId).catch(async (err) => {
+    console.error('[tt-exporter] follower export failed', err);
+    await mutateState((s) => {
+      s.followerStep.phase = 'error';
+      s.followerStep.error = String(err?.message || err);
+    });
+  });
+  return { ok: true };
+}
+
+async function runFollowerExport(tabId) {
+  let state = await getState();
+  if (state.followerStep.phase === 'cancelled') return;
+
+  const url = buildFollowerHistoryURL(state.insightTemplate);
+  let res = await sendToTab(tabId, { type: 'page-fetch', url }).catch(
+    (err) => ({ ok: false, error: String(err) })
+  );
+  if (!res?.ok) {
+    await sleep(3000);
+    res = await sendToTab(tabId, { type: 'page-fetch', url }).catch(
+      (err) => ({ ok: false, error: String(err) })
+    );
+  }
+  if (!res?.ok || !res.body) {
+    await mutateState((s) => {
+      s.followerStep.phase = 'error';
+      s.followerStep.error = res?.error || 'fetch failed';
+    });
+    return;
+  }
+
+  let json;
+  try { json = JSON.parse(res.body); }
+  catch {
+    await mutateState((s) => {
+      s.followerStep.phase = 'error';
+      s.followerStep.error = 'invalid JSON in response';
+    });
+    return;
+  }
+
+  state = await getState();
+  const parsed = parseFollowerHistoryResponse(json, new Date(), {
+    profile: state.profile,
+    limitDays: 365
+  });
+  if (!parsed.ok) {
+    await mutateState((s) => {
+      s.followerStep.phase = 'error';
+      s.followerStep.error = parsed.reason;
+    });
+    return;
+  }
+
+  const allNoData = parsed.rows.every((r) => r.data_quality === 'no_data');
+
+  await mutateState((s) => {
+    s.followerStep.phase = 'done';
+    s.followerStep.rows = parsed.rows;
+    s.followerStep.progress.message = allNoData
+      ? 'Done. Your account may be too new for follower history.'
+      : `Done. ${parsed.rows.length} days of follower data.`;
+    s.followerStep.finishedAt = Date.now();
+  });
 }
 
 function sendToTab(tabId, message) {
