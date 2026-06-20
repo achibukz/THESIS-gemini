@@ -127,8 +127,6 @@ async function handleMessage(msg, sender) {
         s.videoStep.progress.message = 'Cancelled by user';
       });
       return { ok: true };
-    case 'single-video-fetch':
-      return singleVideoFetch(msg.tabId, msg.awemeId);
     default:
       return { ok: false, error: `Unknown message: ${msg?.type}` };
   }
@@ -485,56 +483,6 @@ function localDayBoundarySec(dateStr, endOfDay) {
 
 function byCreateTimeDesc(a, b) {
   return (b.create_time ?? 0) - (a.create_time ?? 0);
-}
-
-async function singleVideoFetch(tabId, awemeId) {
-  if (!tabId) return { ok: false, error: 'Missing tabId' };
-  if (!awemeId) return { ok: false, error: 'Missing aweme_id' };
-  const normalized = String(awemeId).trim();
-  const id = extractAwemeId(normalized);
-  if (!id) return { ok: false, error: 'Could not parse aweme_id from input' };
-
-  const state = await getState();
-  const url = buildInsightURL(state.insightTemplate, id);
-  const t0 = Date.now();
-  let res;
-  try {
-    res = await sendToTab(tabId, { type: 'page-fetch', url });
-  } catch (err) {
-    return { ok: false, error: String(err), url };
-  }
-  const elapsed = Date.now() - t0;
-  if (!res?.ok || !res.body) {
-    return { ok: false, error: res?.error || 'fetch failed', url, elapsed };
-  }
-
-  let json;
-  try {
-    json = JSON.parse(res.body);
-  } catch (err) {
-    return { ok: false, error: 'invalid JSON', url, elapsed, rawSnippet: res.body.slice(0, 400) };
-  }
-
-  const parsed = parseInsightResponse(json, { aweme_id: id, create_time: null });
-  return {
-    ok: true,
-    awemeId: id,
-    url,
-    elapsed,
-    status: res.status,
-    row: parsed.ok ? parsed.row : null,
-    parseError: parsed.ok ? null : parsed.reason,
-    raw: json
-  };
-}
-
-function extractAwemeId(input) {
-  if (/^\d{6,}$/.test(input)) return input;
-  const m = input.match(/(?:\/video\/|\/photo\/|aweme_id=|item_id=)(\d{6,})/);
-  if (m) return m[1];
-  const lone = input.match(/(\d{15,25})/);
-  if (lone) return lone[1];
-  return null;
 }
 
 async function fetchInsightRow(tabId, video, template) {
