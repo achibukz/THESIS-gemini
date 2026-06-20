@@ -62,10 +62,18 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     sendResponse({ ok: true, isStudio: isStudioContentPage() });
     return false;
   }
+  if (msg?.type === 'is-followers-page') {
+    sendResponse({ ok: true, isFollowers: isFollowersAnalyticsPage() });
+    return false;
+  }
 });
 
 function isStudioContentPage() {
   return /\/(creator-center|tiktokstudio)\/content/i.test(window.location.pathname);
+}
+
+function isFollowersAnalyticsPage() {
+  return /\/(creator-center|tiktokstudio)\/analytics\/followers/i.test(window.location.pathname);
 }
 
 function pageFetch(url, headers) {
