@@ -170,3 +170,14 @@ export function buildFollowerHistoryURL(template) {
   const sep = base.includes('?') ? '&' : '?';
   return `${base}${sep}type_requests=${encodeURIComponent(JSON.stringify(FOLLOWER_TYPE_REQUESTS))}`;
 }
+
+export function mapIndexToDate(i, _length, anchorIndex, anchorDate) {
+  const delta = i - anchorIndex;
+  const d = new Date(Date.UTC(
+    anchorDate.getUTCFullYear(),
+    anchorDate.getUTCMonth(),
+    anchorDate.getUTCDate() + delta
+  ));
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}`;
+}
