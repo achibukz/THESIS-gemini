@@ -111,6 +111,13 @@ function wireModules() {
   document.getElementById('m2-open').addEventListener('click', () => openTab(STUDIO_FOLLOWERS_URL));
   document.getElementById('m2-extract').addEventListener('click', startFollowerExtract);
   document.getElementById('m2-save').addEventListener('click', saveFollowerCSV);
+  const dbgFilter = document.getElementById('dbg-filter');
+  if (dbgFilter) dbgFilter.addEventListener('input', refresh);
+  document.getElementById('dbg-copy').addEventListener('click', copyDebugURLs);
+  document.getElementById('dbg-clear').addEventListener('click', async () => {
+    await sendBg({ type: 'reset-state' });
+    await refresh();
+  });
 }
 
 async function openTab(url) {
@@ -268,8 +275,85 @@ async function downloadCSV(filename, csv) {
 function showErr(id, msg) { const el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.remove('hide'); } }
 function hideErr(id) { const el = document.getElementById(id); if (el) { el.textContent = ''; el.classList.add('hide'); } }
 
-// Placeholder for Step 2 — implemented in Task 14.
-function renderModule2() {}
-function startFollowerExtract() {}
-function saveFollowerCSV() {}
-function renderDebugUrls() {}
+function renderModule2(fs) {
+  const phase = fs.phase;
+  showOnly('mod2', phaseToPaneM2(phase, m2OnPage));
+  setPill('pill2', phase, m2OnPage, 2);
+  setDot('dot2', phase === 'done');
+  if (phase === 'fetching') {
+    setBar('bar2', 50);
+    setText('meta2', fs.progress?.message || 'Fetching…');
+  }
+  if (phase === 'done') {
+    const allBlank = fs.rows.every((r) => r.data_quality === 'no_data');
+    setText('m2-summary', allBlank
+      ? `${fs.rows.length} days · account may be too new`
+      : `${fs.rows.length} days`);
+  }
+  if (phase === 'error') showErr('m2-error', fs.error || 'Unknown error');
+  else hideErr('m2-error');
+}
+
+function phaseToPaneM2(phase, onPage) {
+  if (phase === 'idle' || phase === 'cancelled') return onPage ? 'ready' : 'idle';
+  if (phase === 'fetching') return 'run';
+  if (phase === 'done') return 'done';
+  if (phase === 'error') return onPage ? 'ready' : 'idle';
+  return 'idle';
+}
+
+async function startFollowerExtract() {
+  hideErr('m2-error');
+  if (!activeTabId) { showErr('m2-error', 'Open TikTok Studio first.'); return; }
+  await sendBg({ type: 'reset-follower-step' });
+  const res = await sendBg({ type: 'start-follower-export', tabId: activeTabId });
+  if (!res?.ok) showErr('m2-error', res?.error || 'Failed to start');
+  await refresh();
+}
+
+async function saveFollowerCSV() {
+  const res = await sendBg({ type: 'get-state' });
+  const rows = res?.state?.followerStep?.rows || [];
+  if (!rows.length) return;
+  const handle = res.state.profile?.creator_handle || 'unknown';
+  const today = isoDate(new Date());
+  const filename = `tiktok_followers_${sanitize(handle)}_${today}.csv`;
+  await downloadCSV(filename, buildCSV(rows, FOLLOWER_CSV_COLUMNS));
+}
+
+function renderDebugUrls(state) {
+  const filterEl = document.getElementById('dbg-filter');
+  const filter = (filterEl?.value || '').trim().toLowerCase();
+  const urls = (state.recentURLs || []).slice().reverse();
+  const ul = document.getElementById('dbg-urls');
+  if (!ul) return;
+  ul.innerHTML = '';
+  for (const entry of urls) {
+    if (filter && !entry.url.toLowerCase().includes(filter)) continue;
+    const li = document.createElement('li');
+    const isList = /item_list|aweme\/post|post\/list|follower/i.test(entry.url);
+    if (isList) li.classList.add('match-list');
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = `${entry.method || 'GET'} ×${entry.count || 1}`;
+    li.appendChild(badge);
+    li.appendChild(document.createTextNode(entry.url));
+    ul.appendChild(li);
+  }
+  const sample = state.lastVideoListSample;
+  const wrap = document.getElementById('dbg-sample-wrap');
+  const pre = document.getElementById('dbg-sample');
+  if (sample) {
+    wrap.classList.remove('hide');
+    pre.textContent = JSON.stringify(sample, null, 2);
+  } else {
+    wrap.classList.add('hide');
+    pre.textContent = '';
+  }
+}
+
+function copyDebugURLs() {
+  const urls = Array.from(document.querySelectorAll('#dbg-urls li'))
+    .map((li) => li.textContent.trim()).join('\n');
+  navigator.clipboard.writeText(urls).catch(() => {});
+}
