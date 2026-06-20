@@ -33,3 +33,14 @@ Run before shipping a new build to a participant.
 - [ ] Mid-Step-1: click **Cancel** → module 1 returns to **ready** state.
 - [ ] Mid-Step-1: close popup → reopen 10 s later → progress resumes.
 - [ ] Debug → **Reset state** → both modules return to **idle** / **ready** (depending on page).
+
+## Save guard: unknown handle is refused
+1. Reload the extension fresh (so `state.profile` is empty).
+2. Run a video extract on TikTok Studio (don't open the profile tab).
+3. Press **Save CSV** in the Videos panel.
+4. **Expect:** the popup shows "Creator handle not detected…" in the
+   m1-error area and no file is downloaded.
+5. Open your TikTok profile in a new tab; wait for it to render.
+6. Press **Save CSV** again.
+7. **Expect:** download succeeds, filename is `tiktok_videos_<your_handle>_<date>.csv`.
+8. Repeat for the Followers panel (m2-error).

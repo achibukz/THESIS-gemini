@@ -287,7 +287,13 @@ async function saveFollowerCSV() {
   const res = await sendBg({ type: 'get-state' });
   const rows = res?.state?.followerStep?.rows || [];
   if (!rows.length) return;
-  const handle = res.state.profile?.creator_handle || 'unknown';
+  const handle = res.state.profile?.creator_handle;
+  if (!handle) {
+    showErr('m2-error',
+      'Creator handle not detected. Open your TikTok profile in a new tab ' +
+      'to let the extension capture it, then try saving again.');
+    return;
+  }
   const today = isoDate(new Date());
   const filename = `tiktok_followers_${sanitize(handle)}_${today}.csv`;
   await downloadCSV(filename, buildCSV(rows, FOLLOWER_CSV_COLUMNS));
