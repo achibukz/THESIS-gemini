@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Mockup A — Calm / Trust</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2733; --muted:#6b7787;
+    --line:#e7ebf2; --accent:#3b6ef5; --accent-soft:#eef3ff;
+    --teal:#0fb5a6; --teal-soft:#e8faf7; --ok:#15924a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);display:flex;flex-direction:column;align-items:center;padding:28px 12px;gap:14px}
+  .frame-label{font-size:12px;color:var(--muted);max-width:380px;text-align:center;line-height:1.5}
+  .frame-label b{color:var(--ink)}
+  .popup{width:372px;background:var(--card);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;box-shadow:0 12px 34px rgba(31,39,51,.10)}
+  /* header */
+  .head{padding:18px 18px 14px;background:linear-gradient(180deg,#fbfcff,#ffffff)}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:34px;height:34px;border-radius:10px;background:var(--accent-soft);
+    display:grid;place-items:center;color:var(--accent);font-size:18px}
+  .brand h1{margin:0;font-size:16px;font-weight:700;letter-spacing:-.2px}
+  .brand p{margin:1px 0 0;font-size:11.5px;color:var(--muted)}
+  .trust{margin:12px 0 0;display:flex;gap:8px;align-items:flex-start;background:var(--teal-soft);
+    border:1px solid #cdeee9;border-radius:10px;padding:9px 11px}
+  .trust .ic{color:var(--teal);font-size:14px;line-height:1.3}
+  .trust p{margin:0;font-size:11px;color:#176b63;line-height:1.45}
+  /* tabs */
+  .tabs{display:flex;gap:4px;padding:10px 12px 0}
+  .tab{flex:1;border:none;background:transparent;font:inherit;font-size:12px;color:var(--muted);
+    padding:8px 4px;border-radius:8px;cursor:pointer}
+  .tab.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  /* body */
+  .body{padding:14px 18px 18px}
+  .lead{font-size:13px;font-weight:600;margin:2px 0 4px}
+  .sub{font-size:11.5px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+  .cards{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+  .dcard{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line);
+    border-radius:12px;padding:12px}
+  .dcard .em{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;flex:none}
+  .dcard.vids .em{background:#eef3ff;color:var(--accent)}
+  .dcard.fol .em{background:#fff2e8;color:#d97a2b}
+  .dcard h3{margin:0;font-size:12.5px;font-weight:650}
+  .dcard p{margin:2px 0 0;font-size:11px;color:var(--muted);line-height:1.45}
+  .dcard .tag{font-size:10px;color:var(--muted);margin-top:5px;display:inline-block;
+    background:#f3f5f9;border-radius:999px;padding:2px 8px}
+  /* range */
+  .range{border:1px dashed var(--line);border-radius:12px;padding:12px;margin-bottom:14px}
+  .range .rl{font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between}
+  .dates{display:flex;gap:8px;margin-bottom:8px}
+  .dates input{flex:1;font:inherit;font-size:11.5px;padding:7px 8px;border:1px solid var(--line);border-radius:8px}
+  .presets{display:flex;gap:6px;flex-wrap:wrap}
+  .presets button{font:inherit;font-size:10.5px;padding:4px 10px;border:1px solid var(--line);
+    background:#fafbfd;border-radius:999px;color:var(--muted);cursor:pointer}
+  .presets button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  /* cta */
+  .cta{width:100%;border:none;background:var(--accent);color:#fff;font:inherit;font-weight:700;
+    font-size:13.5px;padding:13px;border-radius:12px;cursor:pointer;box-shadow:0 6px 16px rgba(59,110,245,.28)}
+  .cta:hover{background:#2f5fe0}
+  .foot{font-size:10.5px;color:var(--muted);text-align:center;margin-top:11px;line-height:1.5}
+  /* result state */
+  .result{display:none}
+  .result.show{display:block}
+  .form.hide{display:none}
+  .done{display:flex;gap:9px;align-items:center;background:#edf9f1;border:1px solid #c6ecd3;
+    border-radius:10px;padding:10px 12px;margin-bottom:12px}
+  .done .ic{color:var(--ok);font-size:16px}
+  .done p{margin:0;font-size:11.5px;color:#176336;line-height:1.4}
+  .dl{display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
+  .dlbtn{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);
+    background:#fff;border-radius:11px;padding:11px 13px;cursor:pointer;font:inherit}
+  .dlbtn:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .dlbtn .l{display:flex;align-items:center;gap:9px}
+  .dlbtn .l .em{font-size:14px}
+  .dlbtn b{font-size:12px;font-weight:600}
+  .dlbtn small{display:block;color:var(--muted);font-size:10px;font-weight:400}
+  .dlbtn .arr{color:var(--accent);font-size:13px}
+  .note{font-size:11px;color:var(--muted);text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+  <div class="frame-label"><b>Option A — Calm / Trust.</b> Privacy-first, deliberately not TikTok-branded. Reads as a personal utility you own. Soft cards, reassurance up top.</div>
+
+  <div class="popup">
+    <div class="head">
+      <div class="brand">
+        <div class="logo">&#128274;</div>
+        <div>
+          <h1>My Creator Stats</h1>
+          <p>Your data, your copy</p>
+        </div>
+      </div>
+      <div class="trust">
+        <span class="ic">&#10003;</span>
+        <p>Everything runs on your own computer. Nothing is uploaded &mdash; you decide what to share, and with whom.</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on">Export my data</button>
+      <button class="tab">One video</button>
+      <button class="tab">Help</button>
+    </div>
+
+    <div class="body">
+      <div class="form" id="formA">
+        <div class="lead">Two files, one click</div>
+        <p class="sub">We&rsquo;ll prepare both files TikTok lets you keep about your own account.</p>
+
+        <div class="cards">
+          <div class="dcard vids">
+            <div class="em">&#128202;</div>
+            <div>
+              <h3>Video performance</h3>
+              <p>Per-video stats (views, watch time, retention) for the dates you choose below.</p>
+              <span class="tag">file 1 of 2</span>
+            </div>
+          </div>
+          <div class="dcard fol">
+            <div class="em">&#128101;</div>
+            <div>
+              <h3>Follower history</h3>
+              <p>Your daily follower count over the last 365 days.</p>
+              <span class="tag">file 2 of 2 &middot; last year</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="range">
+          <div class="rl"><span>Date range <em style="font-style:normal">(applies to videos)</em></span></div>
+          <div class="dates">
+            <input type="date" value="2026-03-01" />
+            <input type="date" value="2026-06-20" />
+          </div>
+          <div class="presets">
+            <button>30 days</button>
+            <button class="on">3 months</button>
+            <button>1 year</button>
+            <button>All time</button>
+          </div>
+        </div>
+
+        <button class="cta" onclick="document.getElementById('formA').classList.add('hide');document.getElementById('resA').classList.add('show')">Prepare my files</button>
+        <div class="foot">This may take a minute for accounts with many videos.<br/>You can close this popup &mdash; we&rsquo;ll keep your TikTok tab in front.</div>
+      </div>
+
+      <div class="result" id="resA">
+        <div class="done">
+          <span class="ic">&#10003;</span>
+          <p><b>Done.</b> Both files are ready and saved only on this computer.</p>
+        </div>
+        <div class="dl">
+          <button class="dlbtn"><span class="l"><span class="em">&#128202;</span><span><b>video_performance.csv</b><small>47 videos &middot; Mar 1 &ndash; Jun 20</small></span></span><span class="arr">&#8595;</span></button>
+          <button class="dlbtn"><span class="l"><span class="em">&#128101;</span><span><b>follower_history.csv</b><small>365 days</small></span></span><span class="arr">&#8595;</span></button>
+        </div>
+        <div class="note">When you&rsquo;re ready, send both files to your researcher.<br/>It&rsquo;s entirely your choice.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

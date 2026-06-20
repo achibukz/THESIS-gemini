@@ -1,3 +1,9 @@
+import {
+  parseInsightResponse,
+  buildFollowerHistoryURL,
+  parseFollowerHistoryResponse
+} from './lib/parsers.js';
+
 const VIDEO_LIST_RES = [
   /\/tiktok\/creator\/manage\/item_list\//i,
   /\/aweme\/v\d+\/web\/aweme\/post\//i,
@@ -33,22 +39,36 @@ const INSIGHT_RETRY_DELAY_MS = 3000;
 
 function defaultState() {
   return {
-    phase: 'idle',
-    dateRange: null,
-    activeTabId: null,
-    videos: {},
+    // shared
     insightTemplate: null,
     profileTemplate: null,
     profile: null,
-    rows: [],
-    skipped: [],
-    progress: { current: 0, total: 0, message: '' },
-    startedAt: null,
-    finishedAt: null,
-    error: null,
     recentURLs: [],
     interceptCounts: { videoList: 0, insight: 0, profile: 0 },
-    lastVideoListSample: null
+    lastVideoListSample: null,
+
+    videoStep: {
+      phase: 'idle',
+      activeTabId: null,
+      dateRange: null,
+      videos: {},
+      rows: [],
+      skipped: [],
+      progress: { current: 0, total: 0, message: '' },
+      startedAt: null,
+      finishedAt: null,
+      error: null
+    },
+
+    followerStep: {
+      phase: 'idle',
+      activeTabId: null,
+      rows: [],
+      progress: { message: '' },
+      startedAt: null,
+      finishedAt: null,
+      error: null
+    }
   };
 }
 
@@ -103,16 +123,32 @@ async function handleMessage(msg, sender) {
     case 'reset-state':
       await resetState();
       return { ok: true };
-    case 'start-export':
-      return startExport(msg.dateRange, msg.tabId);
-    case 'cancel-export':
+    case 'start-video-export':
+      return startVideoExport(msg.dateRange, msg.tabId);
+    case 'cancel-video-export':
       await mutateState((s) => {
-        s.phase = 'cancelled';
-        s.progress.message = 'Cancelled by user';
+        s.videoStep.phase = 'cancelled';
+        s.videoStep.progress.message = 'Cancelled by user';
       });
       return { ok: true };
-    case 'single-video-fetch':
-      return singleVideoFetch(msg.tabId, msg.awemeId);
+    case 'start-follower-export':
+      return startFollowerExport(msg.tabId);
+    case 'cancel-follower-export':
+      await mutateState((s) => {
+        s.followerStep.phase = 'cancelled';
+        s.followerStep.progress.message = 'Cancelled by user';
+      });
+      return { ok: true };
+    case 'reset-follower-step':
+      await mutateState((s) => {
+        s.followerStep = defaultState().followerStep;
+      });
+      return { ok: true };
+    case 'reset-video-step':
+      await mutateState((s) => {
+        s.videoStep = defaultState().videoStep;
+      });
+      return { ok: true };
     default:
       return { ok: false, error: `Unknown message: ${msg?.type}` };
   }
@@ -181,8 +217,8 @@ async function ingestVideoList(json) {
     for (const raw of items) {
       const f = extractItemFields(raw);
       if (!f) continue;
-      const existing = s.videos[f.aweme_id] || {};
-      s.videos[f.aweme_id] = {
+      const existing = s.videoStep.videos[f.aweme_id] || {};
+      s.videoStep.videos[f.aweme_id] = {
         aweme_id: f.aweme_id,
         create_time: f.create_time ?? existing.create_time,
         desc: f.desc ?? existing.desc,
@@ -334,75 +370,75 @@ function buildInsightURL(template, awemeId) {
   return `${base}${sep}type_requests=${encodeURIComponent(JSON.stringify(typeRequests))}`;
 }
 
-async function startExport(dateRange, tabId) {
+async function startVideoExport(dateRange, tabId) {
   if (!tabId) return { ok: false, error: 'Missing tabId' };
 
   await mutateState((s) => {
-    s.phase = 'collecting-list';
-    s.dateRange = dateRange;
-    s.activeTabId = tabId;
-    s.rows = [];
-    s.skipped = [];
-    s.progress = { current: 0, total: 0, message: 'Scrolling to load video list...' };
-    s.startedAt = Date.now();
-    s.finishedAt = null;
-    s.error = null;
+    s.videoStep.phase = 'collecting-list';
+    s.videoStep.dateRange = dateRange;
+    s.videoStep.activeTabId = tabId;
+    s.videoStep.rows = [];
+    s.videoStep.skipped = [];
+    s.videoStep.progress = { current: 0, total: 0, message: 'Scrolling to load video list...' };
+    s.videoStep.startedAt = Date.now();
+    s.videoStep.finishedAt = null;
+    s.videoStep.error = null;
   });
 
-  runExport(tabId).catch(async (err) => {
+  runVideoExport(tabId).catch(async (err) => {
     console.error('[tt-exporter] export failed', err);
     await mutateState((s) => {
-      s.phase = 'error';
-      s.error = String(err?.message || err);
+      s.videoStep.phase = 'error';
+      s.videoStep.error = String(err?.message || err);
     });
   });
 
   return { ok: true };
 }
 
-async function runExport(tabId) {
+async function runVideoExport(tabId) {
   await sendToTab(tabId, { type: 'scroll-to-bottom' });
 
   let state = await getState();
-  if (state.phase === 'cancelled') return;
+  if (state.videoStep.phase === 'cancelled') return;
 
-  const filtered = filterVideosByDate(state.videos, state.dateRange);
+  const filtered = filterVideosByDate(state.videoStep.videos, state.videoStep.dateRange);
   if (filtered.length === 0) {
     await mutateState((s) => {
-      s.phase = 'done';
-      s.progress.message = 'No videos found in selected date range';
-      s.finishedAt = Date.now();
+      s.videoStep.phase = 'done';
+      s.videoStep.progress.message = 'No videos found in selected date range';
+      s.videoStep.finishedAt = Date.now();
     });
     return;
   }
 
   if (filtered.length > MAX_VIDEOS) {
     await mutateState((s) => {
-      s.progress.message = `Capped at ${MAX_VIDEOS} videos (had ${filtered.length})`;
+      s.videoStep.progress.message = `Capped at ${MAX_VIDEOS} videos (had ${filtered.length})`;
     });
     filtered.length = MAX_VIDEOS;
   }
 
   await mutateState((s) => {
-    s.phase = 'fetching-insights';
-    s.progress = { current: 0, total: filtered.length, message: 'Fetching insights...' };
+    s.videoStep.phase = 'fetching-insights';
+    s.videoStep.progress = { current: 0, total: filtered.length, message: 'Fetching insights...' };
   });
 
   for (let i = 0; i < filtered.length; i++) {
     state = await getState();
-    if (state.phase === 'cancelled') return;
+    if (state.videoStep.phase === 'cancelled') return;
 
     const video = filtered[i];
     const row = await fetchInsightRow(tabId, video, state.insightTemplate);
 
     await mutateState((s) => {
       if (row.ok) {
-        s.rows.push(row.row);
+        s.videoStep.rows.push(row.row);
       } else {
-        s.skipped.push({ aweme_id: video.aweme_id, reason: row.reason });
+        s.videoStep.skipped.push({ aweme_id: video.aweme_id, reason: row.reason });
       }
-      s.progress.current = i + 1;
-      s.progress.message = `Processed ${i + 1} of ${filtered.length}`;
+      s.videoStep.progress.current = i + 1;
+      s.videoStep.progress.message = `Processed ${i + 1} of ${filtered.length}`;
     });
 
     if (i < filtered.length - 1) {
@@ -412,34 +448,9 @@ async function runExport(tabId) {
   }
 
   await mutateState((s) => {
-    s.phase = 'fetching-profile';
-    s.progress.message = 'Fetching creator profile...';
-  });
-
-  state = await getState();
-  const profileURL = state.profileTemplate || DEFAULT_PROFILE_URL;
-  const profileRes = await sendToTab(tabId, { type: 'page-fetch', url: profileURL }).catch(
-    (err) => ({ ok: false, error: String(err) })
-  );
-  if (profileRes?.ok && profileRes.body) {
-    try {
-      await ingestProfile(JSON.parse(profileRes.body));
-    } catch (_e) { /* ignore */ }
-  }
-
-  await mutateState((s) => {
-    if (s.profile) {
-      const created = formatUnixDate(s.profile.account_created_time);
-      for (const row of s.rows) {
-        row.follower_count = s.profile.follower_count ?? row.follower_count ?? '';
-        row.account_created_date = created ?? row.account_created_date ?? '';
-        if (!row.creator_uid) row.creator_uid = s.profile.creator_uid ?? '';
-        if (!row.creator_handle) row.creator_handle = s.profile.creator_handle ?? '';
-      }
-    }
-    s.phase = 'done';
-    s.progress.message = `Done. ${s.rows.length} rows, ${s.skipped.length} skipped.`;
-    s.finishedAt = Date.now();
+    s.videoStep.phase = 'done';
+    s.videoStep.progress.message = `Done. ${s.videoStep.rows.length} rows, ${s.videoStep.skipped.length} skipped.`;
+    s.videoStep.finishedAt = Date.now();
   });
 }
 
@@ -471,56 +482,6 @@ function byCreateTimeDesc(a, b) {
   return (b.create_time ?? 0) - (a.create_time ?? 0);
 }
 
-async function singleVideoFetch(tabId, awemeId) {
-  if (!tabId) return { ok: false, error: 'Missing tabId' };
-  if (!awemeId) return { ok: false, error: 'Missing aweme_id' };
-  const normalized = String(awemeId).trim();
-  const id = extractAwemeId(normalized);
-  if (!id) return { ok: false, error: 'Could not parse aweme_id from input' };
-
-  const state = await getState();
-  const url = buildInsightURL(state.insightTemplate, id);
-  const t0 = Date.now();
-  let res;
-  try {
-    res = await sendToTab(tabId, { type: 'page-fetch', url });
-  } catch (err) {
-    return { ok: false, error: String(err), url };
-  }
-  const elapsed = Date.now() - t0;
-  if (!res?.ok || !res.body) {
-    return { ok: false, error: res?.error || 'fetch failed', url, elapsed };
-  }
-
-  let json;
-  try {
-    json = JSON.parse(res.body);
-  } catch (err) {
-    return { ok: false, error: 'invalid JSON', url, elapsed, rawSnippet: res.body.slice(0, 400) };
-  }
-
-  const parsed = parseInsightResponse(json, { aweme_id: id, create_time: null });
-  return {
-    ok: true,
-    awemeId: id,
-    url,
-    elapsed,
-    status: res.status,
-    row: parsed.ok ? parsed.row : null,
-    parseError: parsed.ok ? null : parsed.reason,
-    raw: json
-  };
-}
-
-function extractAwemeId(input) {
-  if (/^\d{6,}$/.test(input)) return input;
-  const m = input.match(/(?:\/video\/|\/photo\/|aweme_id=|item_id=)(\d{6,})/);
-  if (m) return m[1];
-  const lone = input.match(/(\d{15,25})/);
-  if (lone) return lone[1];
-  return null;
-}
-
 async function fetchInsightRow(tabId, video, template) {
   const url = buildInsightURL(template, video.aweme_id);
   let res = await sendToTab(tabId, { type: 'page-fetch', url }).catch(
@@ -548,174 +509,84 @@ async function fetchInsightRow(tabId, video, template) {
   return parseInsightResponse(json, video);
 }
 
-function parseInsightResponse(json, video) {
-  const data = json?.data || json;
-  if (!data) return { ok: false, reason: 'empty response' };
+async function startFollowerExport(tabId) {
+  if (!tabId) return { ok: false, error: 'Missing tabId' };
 
-  const statusFlag = data?.status ?? json?.status;
-  const dataQualityIssues = [];
-  if (statusFlag === 2) dataQualityIssues.push('insufficient_data');
+  await mutateState((s) => {
+    s.followerStep.phase = 'fetching';
+    s.followerStep.activeTabId = tabId;
+    s.followerStep.rows = [];
+    s.followerStep.progress = { message: 'Fetching follower history…' };
+    s.followerStep.startedAt = Date.now();
+    s.followerStep.finishedAt = null;
+    s.followerStep.error = null;
+  });
 
-  const videoInfo =
-    data?.video_info ||
-    data?.aweme_info ||
-    findFirstByKey(data, 'video_info') ||
-    {};
-
-  const stats = videoInfo?.statistics || {};
-
-  const retention = findInsight(data, 'video_retention_rate_realtime');
-  const perDuration = findInsight(data, 'video_per_duration_realtime');
-  const finishRate = findInsight(data, 'video_finish_rate_realtime');
-  const trafficSource = findInsight(data, 'video_traffic_source_percent_realtime');
-  const newFollowers = findInsight(data, 'video_new_followers');
-  const totalViews = findInsight(data, 'realtime_total_video_views');
-
-  const ecr = readRetentionAt(retention, '5000');
-  if (ecr == null && statusFlag !== 2) dataQualityIssues.push('missing_ecr');
-
-  const avgWatchTimeS = readNumericValue(perDuration);
-  const durationMs = videoInfo?.video?.duration ?? videoInfo?.duration ?? video.duration_ms ?? null;
-  const nawp =
-    avgWatchTimeS != null && durationMs
-      ? avgWatchTimeS / (durationMs / 1000)
-      : null;
-
-  const traffic = readTrafficSources(trafficSource);
-
-  const createTs = videoInfo?.create_time ?? video.create_time;
-  const row = {
-    video_id: video.aweme_id,
-    post_date: formatUnixDate(createTs),
-    post_time: formatUnixTime(createTs),
-    caption: videoInfo?.desc ?? video.desc ?? '',
-    duration_ms: durationMs ?? video.duration_ms ?? '',
-    views: readNumericValue(totalViews) ?? stats.play_count ?? '',
-    likes: stats.digg_count ?? video.digg_count ?? '',
-    comments: stats.comment_count ?? video.comment_count ?? '',
-    shares: stats.share_count ?? video.share_count ?? '',
-    ECR: ecr ?? '',
-    avg_watch_time_s: avgWatchTimeS ?? '',
-    NAWP: nawp != null ? roundTo(nawp, 6) : '',
-    watched_full_pct: readNumericValue(finishRate) ?? '',
-    traffic_foryou_pct: traffic.foryou ?? '',
-    traffic_follow_pct: traffic.follow ?? '',
-    traffic_profile_pct: traffic.profile ?? '',
-    traffic_search_pct: traffic.search ?? '',
-    new_followers: readNumericValue(newFollowers) ?? '',
-    creator_uid: videoInfo?.author?.uid ?? '',
-    creator_handle: videoInfo?.author?.unique_id ?? '',
-    follower_count: '',
-    account_created_date: '',
-    data_quality: dataQualityIssues.join('|')
-  };
-
-  return { ok: true, row };
+  runFollowerExport(tabId).catch(async (err) => {
+    console.error('[tt-exporter] follower export failed', err);
+    await mutateState((s) => {
+      s.followerStep.phase = 'error';
+      s.followerStep.error = String(err?.message || err);
+    });
+  });
+  return { ok: true };
 }
 
-function findInsight(data, insighType) {
-  if (!data || typeof data !== 'object') return null;
-  if (Object.prototype.hasOwnProperty.call(data, insighType)) return data[insighType];
+async function runFollowerExport(tabId) {
+  let state = await getState();
+  if (state.followerStep.phase === 'cancelled') return;
 
-  const stack = [data];
-  while (stack.length) {
-    const node = stack.pop();
-    if (!node || typeof node !== 'object') continue;
-    if (Array.isArray(node)) {
-      for (const item of node) {
-        if (item && typeof item === 'object') {
-          if (item.insigh_type === insighType || item.insight_type === insighType) return item;
-          stack.push(item);
-        }
-      }
-    } else {
-      if (Object.prototype.hasOwnProperty.call(node, insighType)) return node[insighType];
-      for (const key of Object.keys(node)) {
-        const v = node[key];
-        if (v && typeof v === 'object') stack.push(v);
-      }
-    }
+  const url = buildFollowerHistoryURL(state.insightTemplate);
+  let res = await sendToTab(tabId, { type: 'page-fetch', url }).catch(
+    (err) => ({ ok: false, error: String(err) })
+  );
+  if (!res?.ok) {
+    await sleep(3000);
+    res = await sendToTab(tabId, { type: 'page-fetch', url }).catch(
+      (err) => ({ ok: false, error: String(err) })
+    );
   }
-  return null;
-}
-
-function findFirstByKey(obj, key) {
-  if (!obj || typeof obj !== 'object') return null;
-  const stack = [obj];
-  while (stack.length) {
-    const node = stack.pop();
-    if (!node || typeof node !== 'object') continue;
-    if (Object.prototype.hasOwnProperty.call(node, key)) return node[key];
-    if (Array.isArray(node)) {
-      for (const v of node) stack.push(v);
-    } else {
-      for (const k of Object.keys(node)) stack.push(node[k]);
-    }
+  if (!res?.ok || !res.body) {
+    await mutateState((s) => {
+      s.followerStep.phase = 'error';
+      s.followerStep.error = res?.error || 'fetch failed';
+    });
+    return;
   }
-  return null;
-}
 
-function readNumericValue(node) {
-  if (node == null) return null;
-  const v = node?.value;
-  if (v == null) return null;
-  if (typeof v === 'object' && 'value' in v) {
-    const n = Number(v.value);
-    return Number.isFinite(n) ? n : null;
+  let json;
+  try { json = JSON.parse(res.body); }
+  catch {
+    await mutateState((s) => {
+      s.followerStep.phase = 'error';
+      s.followerStep.error = 'invalid JSON in response';
+    });
+    return;
   }
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
 
-function readRetentionAt(node, timestamp) {
-  const list = node?.value?.list ?? node?.value?.value?.list ?? node?.list;
-  if (!Array.isArray(list)) return null;
-  const target = String(timestamp);
-  const entry = list.find((e) => String(e?.timestamp) === target);
-  if (!entry) return null;
-  const v = entry.value;
-  const n = Number(typeof v === 'object' ? v?.value : v);
-  return Number.isFinite(n) ? n : null;
-}
-
-function readTrafficSources(node) {
-  const out = { foryou: null, follow: null, profile: null, search: null };
-  const list = node?.value?.value ?? node?.value?.list ?? node?.value;
-  if (!Array.isArray(list)) return out;
-  for (const entry of list) {
-    const key = (entry?.key ?? entry?.name ?? '').toString();
-    const val = Number(entry?.value ?? entry?.percent ?? 0);
-    if (!Number.isFinite(val)) continue;
-    const norm = key.toLowerCase();
-    if (norm === 'for you') out.foryou = val;
-    else if (norm === 'follow') out.follow = val;
-    else if (norm === 'personal profile') out.profile = val;
-    else if (norm === 'search') out.search = val;
+  state = await getState();
+  const parsed = parseFollowerHistoryResponse(json, new Date(), {
+    profile: state.profile,
+    limitDays: 365
+  });
+  if (!parsed.ok) {
+    await mutateState((s) => {
+      s.followerStep.phase = 'error';
+      s.followerStep.error = parsed.reason;
+    });
+    return;
   }
-  return out;
-}
 
-function formatUnixDate(unixSeconds) {
-  if (!unixSeconds) return '';
-  const ms = unixSeconds > 1e12 ? unixSeconds : unixSeconds * 1000;
-  const d = new Date(ms);
-  if (Number.isNaN(d.getTime())) return '';
-  const p = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
+  const allNoData = parsed.rows.every((r) => r.data_quality === 'no_data');
 
-function formatUnixTime(unixSeconds) {
-  if (!unixSeconds) return '';
-  const ms = unixSeconds > 1e12 ? unixSeconds : unixSeconds * 1000;
-  const d = new Date(ms);
-  if (Number.isNaN(d.getTime())) return '';
-  const p = (n) => String(n).padStart(2, '0');
-  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-}
-
-function roundTo(n, decimals) {
-  const k = 10 ** decimals;
-  return Math.round(n * k) / k;
+  await mutateState((s) => {
+    s.followerStep.phase = 'done';
+    s.followerStep.rows = parsed.rows;
+    s.followerStep.progress.message = allNoData
+      ? 'Done. Your account may be too new for follower history.'
+      : `Done. ${parsed.rows.length} days of follower data.`;
+    s.followerStep.finishedAt = Date.now();
+  });
 }
 
 function sendToTab(tabId, message) {

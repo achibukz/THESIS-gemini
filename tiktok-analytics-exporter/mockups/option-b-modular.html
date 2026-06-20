@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Mockup B (modular) — step-by-step, page-aware</title>
+<style>
+  :root{
+    --card:#ffffff; --ink:#121417; --muted:#7a8089; --line:#ececef;
+    --red:#fe2c55; --cyan:#20d5ec; --dark:#16171b; --ok:#10a554; --ok-soft:#e8f8ef;
+    --amber:#b8791b; --amber-soft:#fff6e6; --amber-line:#f1ddb0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#1a1b20;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);display:flex;flex-direction:column;align-items:center;padding:28px 12px;gap:14px}
+  .frame-label{font-size:12px;color:#b9bcc4;max-width:400px;text-align:center;line-height:1.5}
+  .frame-label b{color:#fff}
+  .popup{width:372px;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  /* header */
+  .head{background:var(--dark);padding:16px 18px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:32px;height:32px;border-radius:9px;position:relative;background:#000;display:grid;place-items:center}
+  .logo b{color:#fff;font-size:15px;font-weight:800}
+  .logo:after{content:"";position:absolute;inset:0;border-radius:9px;box-shadow:1.5px 1.5px 0 var(--cyan),-1.5px -1.5px 0 var(--red);opacity:.9}
+  .brand h1{margin:0;font-size:15.5px;font-weight:700;color:#fff;letter-spacing:-.2px}
+  .brand p{margin:1px 0 0;font-size:11px;color:#9aa0aa}
+  .rights{margin:11px 0 0;font-size:10.5px;color:#aeb3bd;display:flex;gap:6px;align-items:center}
+  .rights .dot{color:var(--cyan)}
+  /* tabs */
+  .tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);padding:0 8px}
+  .tab{flex:1;border:none;background:transparent;font:inherit;font-size:12px;color:var(--muted);
+    padding:11px 4px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:600}
+  .tab.on{color:var(--ink);border-bottom-color:var(--red)}
+  /* progress strip */
+  .strip{display:flex;align-items:center;justify-content:space-between;padding:12px 18px 4px}
+  .strip .dots{display:flex;align-items:center;gap:7px}
+  .strip .d{display:flex;align-items:center;gap:6px}
+  .strip .pip{width:20px;height:20px;border-radius:50%;background:#eceef1;color:var(--muted);
+    display:grid;place-items:center;font-size:10.5px;font-weight:700}
+  .strip .d.done .pip{background:var(--ok);color:#fff}
+  .strip .d .t{font-size:10.5px;color:var(--muted);font-weight:600}
+  .strip .d.done .t{color:var(--ink)}
+  .strip .seg{width:18px;height:2px;background:#eceef1;border-radius:2px}
+  .strip .count{font-size:10.5px;color:var(--muted)}
+  .strip .count b{color:var(--ink)}
+  .body{padding:8px 16px 16px}
+  /* module card */
+  .mod{border:1px solid var(--line);border-radius:12px;padding:0;margin-bottom:12px;overflow:hidden}
+  .mod-h{display:flex;align-items:center;gap:10px;padding:12px 13px}
+  .mod-h .em{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:15px;flex:none}
+  .mod.video .em{background:#ffe9ee;color:var(--red)}
+  .mod.fol .em{background:#e6fbfe;color:#0fa9c4}
+  .mod-h .tx{flex:1}
+  .mod-h b{font-size:12.5px;font-weight:650;display:block}
+  .mod-h small{font-size:10.5px;color:var(--muted)}
+  .pill{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .pill.todo{background:#f2f3f5;color:var(--muted)}
+  .pill.ready{background:#e6fbfe;color:#0a8aa3}
+  .pill.done{background:var(--ok-soft);color:var(--ok)}
+  .mod-b{padding:0 13px 13px;border-top:1px solid var(--line)}
+  .guide{display:flex;gap:8px;align-items:flex-start;background:var(--amber-soft);border:1px solid var(--amber-line);
+    border-radius:9px;padding:9px 10px;margin:12px 0 10px}
+  .guide .ic{color:var(--amber);font-size:13px;line-height:1.2}
+  .guide p{margin:0;font-size:11px;color:#7c5410;line-height:1.5}
+  .guide code{background:#fff;border:1px solid var(--amber-line);border-radius:4px;padding:0 4px;font-size:10px}
+  .onpage{display:flex;gap:7px;align-items:center;background:var(--ok-soft);border:1px solid #c2ebd3;
+    border-radius:9px;padding:8px 10px;margin:12px 0 10px;font-size:11px;color:#106b3a}
+  .onpage .ic{color:var(--ok);font-weight:800}
+  .btn{width:100%;border:none;font:inherit;font-weight:700;font-size:12.5px;padding:11px;border-radius:9px;cursor:pointer}
+  .btn.open{background:#111;color:#fff}
+  .btn.open:hover{background:#000}
+  .btn.extract{background:var(--red);color:#fff}
+  .btn.extract:hover{background:#e0254a}
+  .btn.extract:disabled{background:#e7e8ea;color:#aab0b8;cursor:not-allowed}
+  .ghost{background:#fff;border:1px solid var(--line);color:var(--muted)}
+  .hintline{font-size:10px;color:var(--muted);text-align:center;margin-top:7px}
+  /* range mini */
+  .range{margin:0 0 10px}
+  .rl{font-size:10.5px;color:var(--muted);margin-bottom:6px;font-weight:600}
+  .dates{display:flex;gap:7px;margin-bottom:7px}
+  .dates input{flex:1;font:inherit;font-size:11px;padding:7px;border:1px solid var(--line);border-radius:7px}
+  .presets{display:flex;gap:5px;flex-wrap:wrap}
+  .presets button{font:inherit;font-size:10px;padding:4px 9px;border:1px solid var(--line);background:#fff;border-radius:7px;color:var(--muted);cursor:pointer}
+  .presets button.on{background:#111;border-color:#111;color:#fff}
+  /* progress bar */
+  .pbar{height:6px;background:#f0f1f3;border-radius:3px;overflow:hidden;margin:10px 0 6px}
+  .pbar > i{display:block;height:100%;width:0;background:var(--red);transition:width .25s}
+  .pmeta{font-size:10.5px;color:var(--muted);text-align:center}
+  /* done file row */
+  .filerow{display:flex;align-items:center;justify-content:space-between;border:1px solid #c2ebd3;
+    background:var(--ok-soft);border-radius:9px;padding:10px 12px;margin-top:11px}
+  .filerow .l{display:flex;align-items:center;gap:8px}
+  .filerow b{font-size:11.5px}
+  .filerow small{display:block;font-size:10px;color:#3f8c5f}
+  .filerow .dl{font-size:11px;color:var(--ok);font-weight:700;cursor:pointer;background:none;border:none}
+  /* finish */
+  .finish{display:none;background:var(--dark);border-radius:12px;padding:14px;color:#fff;text-align:center}
+  .finish.show{display:block}
+  .finish .big{font-size:22px}
+  .finish b{font-size:13px;display:block;margin:4px 0 3px}
+  .finish p{margin:0;font-size:11px;color:#b9bcc4;line-height:1.5}
+  .hide{display:none !important}
+</style>
+</head>
+<body>
+  <div class="frame-label"><b>Option B &mdash; modular / page-aware.</b> Same TikTok-native look, now two independent steps. Each one guides you to the right TikTok tab, then unlocks Extract once you&rsquo;re on it. Click <b>Open&hellip;</b> then <b>Extract&hellip;</b> to see the states.</div>
+
+  <div class="popup">
+    <div class="head">
+      <div class="brand">
+        <div class="logo"><b>&#9834;</b></div>
+        <div>
+          <h1>Analytics Backup</h1>
+          <p>A companion for TikTok Studio</p>
+        </div>
+      </div>
+      <div class="rights"><span class="dot">&#9679;</span> Exports only the stats TikTok already lets you, the creator, access.</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on">Export</button>
+      <button class="tab">Single video</button>
+      <button class="tab">Help</button>
+    </div>
+
+    <div class="strip">
+      <div class="dots">
+        <div class="d" id="dot1"><span class="pip">1</span><span class="t">Video stats</span></div>
+        <span class="seg"></span>
+        <div class="d" id="dot2"><span class="pip">2</span><span class="t">Followers</span></div>
+      </div>
+      <div class="count"><b id="cnt">0</b> of 2 ready</div>
+    </div>
+
+    <div class="body">
+
+      <!-- MODULE 1: VIDEO PERFORMANCE -->
+      <div class="mod video" id="mod1">
+        <div class="mod-h">
+          <div class="em">&#128202;</div>
+          <div class="tx"><b>Video performance</b><small>Per-video views, watch time &amp; retention</small></div>
+          <span class="pill todo" id="pill1">Step 1</span>
+        </div>
+        <div class="mod-b">
+          <!-- idle -->
+          <div id="m1-idle">
+            <div class="guide">
+              <span class="ic">&#9888;</span>
+              <p>This data lives on your <b>Content</b> page. Open it first, then come back here.</p>
+            </div>
+            <button class="btn open" onclick="ready(1)">Open my Content page</button>
+            <div class="hintline">&hellip;or switch to that tab yourself, then reopen this popup</div>
+          </div>
+          <!-- ready -->
+          <div id="m1-ready" class="hide">
+            <div class="onpage"><span class="ic">&#10003;</span> You&rsquo;re on the Content page &mdash; ready to extract.</div>
+            <div class="range">
+              <div class="rl">Date range</div>
+              <div class="dates">
+                <input type="date" value="2026-03-01" />
+                <input type="date" value="2026-06-20" />
+              </div>
+              <div class="presets">
+                <button>30d</button><button class="on">3 mo</button><button>1 yr</button><button>All</button>
+              </div>
+            </div>
+            <button class="btn extract" onclick="extract(1)">Extract video stats</button>
+          </div>
+          <!-- running -->
+          <div id="m1-run" class="hide">
+            <div class="pbar"><i id="bar1"></i></div>
+            <div class="pmeta" id="meta1">Reading video 18 of 47&hellip;</div>
+          </div>
+          <!-- done -->
+          <div id="m1-done" class="hide">
+            <div class="filerow">
+              <span class="l"><span>&#128202;</span><span><b>video_performance.csv</b><small>47 videos &middot; Mar 1 &ndash; Jun 20</small></span></span>
+              <button class="dl">&#8595; Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 2: FOLLOWER HISTORY -->
+      <div class="mod fol" id="mod2">
+        <div class="mod-h">
+          <div class="em">&#128101;</div>
+          <div class="tx"><b>Follower history</b><small>Daily follower count &middot; last 365 days</small></div>
+          <span class="pill todo" id="pill2">Step 2</span>
+        </div>
+        <div class="mod-b">
+          <!-- idle -->
+          <div id="m2-idle">
+            <div class="guide">
+              <span class="ic">&#9888;</span>
+              <p>Open <b>Analytics &rarr; Followers</b> and set the filter to <code>Last 365 days</code>. Then come back here.</p>
+            </div>
+            <button class="btn open" onclick="ready(2)">Open my Followers analytics</button>
+            <div class="hintline">&hellip;or switch to that tab yourself, then reopen this popup</div>
+          </div>
+          <!-- ready -->
+          <div id="m2-ready" class="hide">
+            <div class="onpage"><span class="ic">&#10003;</span> You&rsquo;re on the Followers page (365-day view) &mdash; ready to extract.</div>
+            <button class="btn extract" onclick="extract(2)">Extract follower history</button>
+          </div>
+          <!-- running -->
+          <div id="m2-run" class="hide">
+            <div class="pbar"><i id="bar2"></i></div>
+            <div class="pmeta" id="meta2">Reading daily follower counts&hellip;</div>
+          </div>
+          <!-- done -->
+          <div id="m2-done" class="hide">
+            <div class="filerow">
+              <span class="l"><span>&#128101;</span><span><b>follower_history.csv</b><small>365 days</small></span></span>
+              <button class="dl">&#8595; Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINISH -->
+      <div class="finish" id="finish">
+        <div class="big">&#127881;</div>
+        <b>Both files are ready</b>
+        <p>Saved on your computer &mdash; nothing was uploaded. Send <b>both</b> to your researcher whenever you choose.</p>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  var doneCount = 0;
+  function show(id){document.getElementById(id).classList.remove('hide');}
+  function hide(id){document.getElementById(id).classList.add('hide');}
+
+  function ready(n){
+    hide('m'+n+'-idle'); show('m'+n+'-ready');
+    var p=document.getElementById('pill'+n); p.className='pill ready'; p.textContent='On page';
+  }
+  function extract(n){
+    hide('m'+n+'-ready'); show('m'+n+'-run');
+    var bar=document.getElementById('bar'+n), w=0;
+    var iv=setInterval(function(){
+      w+=Math.random()*22; if(w>=100){w=100;clearInterval(iv);finishMod(n);}
+      bar.style.width=w+'%';
+    },140);
+  }
+  function finishMod(n){
+    setTimeout(function(){
+      hide('m'+n+'-run'); show('m'+n+'-done');
+      var p=document.getElementById('pill'+n); p.className='pill done'; p.textContent='✓ Done';
+      document.getElementById('dot'+n).classList.add('done');
+      doneCount++; document.getElementById('cnt').textContent=doneCount;
+      if(doneCount===2) document.getElementById('finish').classList.add('show');
+    },220);
+  }
+</script>
+</body>
+</html>

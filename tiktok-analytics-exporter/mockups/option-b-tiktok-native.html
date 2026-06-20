@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Mockup B — TikTok-native companion</title>
+<style>
+  :root{
+    --bg:#0e0e12; --card:#ffffff; --ink:#121417; --muted:#7a8089;
+    --line:#ececef; --red:#fe2c55; --cyan:#20d5ec; --dark:#16171b; --ok:#10a554;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#1a1b20;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);display:flex;flex-direction:column;align-items:center;padding:28px 12px;gap:14px}
+  .frame-label{font-size:12px;color:#b9bcc4;max-width:380px;text-align:center;line-height:1.5}
+  .frame-label b{color:#fff}
+  .popup{width:372px;background:var(--card);border-radius:14px;overflow:hidden;
+    box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  /* header dark */
+  .head{background:var(--dark);padding:16px 18px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:32px;height:32px;border-radius:9px;position:relative;background:#000;display:grid;place-items:center}
+  .logo b{color:#fff;font-size:15px;font-weight:800}
+  .logo:after{content:"";position:absolute;inset:0;border-radius:9px;
+    box-shadow:1.5px 1.5px 0 var(--cyan),-1.5px -1.5px 0 var(--red);opacity:.9;z-index:-0}
+  .brand h1{margin:0;font-size:15.5px;font-weight:700;color:#fff;letter-spacing:-.2px}
+  .brand p{margin:1px 0 0;font-size:11px;color:#9aa0aa}
+  .rights{margin:11px 0 0;font-size:10.5px;color:#aeb3bd;display:flex;gap:6px;align-items:center}
+  .rights .dot{color:var(--cyan)}
+  /* tabs underline */
+  .tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);padding:0 8px}
+  .tab{flex:1;border:none;background:transparent;font:inherit;font-size:12px;color:var(--muted);
+    padding:11px 4px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:600}
+  .tab.on{color:var(--ink);border-bottom-color:var(--red)}
+  .body{padding:15px 18px 18px}
+  .lead{font-size:13px;font-weight:700;margin:0 0 3px}
+  .sub{font-size:11px;color:var(--muted);margin:0 0 13px;line-height:1.5}
+  /* deliverable rows */
+  .rows{border:1px solid var(--line);border-radius:11px;overflow:hidden;margin-bottom:14px}
+  .row{display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .row .em{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:14px;flex:none}
+  .row.v .em{background:#ffe9ee;color:var(--red)}
+  .row.f .em{background:#e6fbfe;color:#0fa9c4}
+  .row .tx{flex:1}
+  .row b{font-size:12px;font-weight:650}
+  .row small{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
+  .chk{width:18px;height:18px;border-radius:6px;background:var(--red);color:#fff;display:grid;place-items:center;font-size:11px;flex:none}
+  /* range compact */
+  .range{margin-bottom:14px}
+  .rl{font-size:11px;color:var(--muted);margin-bottom:7px;font-weight:600}
+  .dates{display:flex;gap:8px;margin-bottom:8px}
+  .dates input{flex:1;font:inherit;font-size:11.5px;padding:8px;border:1px solid var(--line);border-radius:8px}
+  .presets{display:flex;gap:6px;flex-wrap:wrap}
+  .presets button{font:inherit;font-size:10.5px;padding:5px 11px;border:1px solid var(--line);
+    background:#fff;border-radius:8px;color:var(--muted);cursor:pointer}
+  .presets button.on{background:#111;border-color:#111;color:#fff}
+  .cta{width:100%;border:none;background:var(--red);color:#fff;font:inherit;font-weight:700;font-size:13.5px;
+    padding:13px;border-radius:10px;cursor:pointer}
+  .cta:hover{background:#e0254a}
+  .foot{font-size:10px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5}
+  /* progress demo */
+  .form.hide{display:none}
+  .result{display:none}.result.show{display:block}
+  .done{display:flex;gap:9px;align-items:center;background:#e8f8ef;border:1px solid #c2ebd3;
+    border-radius:10px;padding:10px 12px;margin-bottom:12px}
+  .done .ic{color:var(--ok);font-size:15px}
+  .done p{margin:0;font-size:11.5px;color:#106b3a;line-height:1.4}
+  .dl{display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
+  .dlbtn{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);
+    border-radius:10px;padding:11px 13px;cursor:pointer;font:inherit;background:#fff}
+  .dlbtn:hover{border-color:var(--red)}
+  .dlbtn .l{display:flex;align-items:center;gap:9px}
+  .dlbtn b{font-size:12px}.dlbtn small{display:block;color:var(--muted);font-size:10px;font-weight:400}
+  .dlbtn .arr{color:var(--red);font-weight:700}
+  .note{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+  <div class="frame-label"><b>Option B — TikTok-native companion.</b> Leans into TikTok&rsquo;s look (red + cyan, dark header). Feels like a natural sidekick to TikTok Studio. Dense and efficient.</div>
+
+  <div class="popup">
+    <div class="head">
+      <div class="brand">
+        <div class="logo"><b>&#9834;</b></div>
+        <div>
+          <h1>Analytics Backup</h1>
+          <p>A companion for TikTok Studio</p>
+        </div>
+      </div>
+      <div class="rights"><span class="dot">&#9679;</span> Exports only the stats TikTok already lets you, the creator, access.</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on">Export</button>
+      <button class="tab">Single video</button>
+      <button class="tab">Help</button>
+    </div>
+
+    <div class="body">
+      <div class="form" id="formB">
+        <div class="lead">Get both of your files</div>
+        <p class="sub">One run produces the two CSVs you keep about your own account.</p>
+
+        <div class="rows">
+          <div class="row v">
+            <div class="em">&#128202;</div>
+            <div class="tx"><b>Video performance</b><small>Per-video stats for your selected range</small></div>
+            <div class="chk">&#10003;</div>
+          </div>
+          <div class="row f">
+            <div class="em">&#128101;</div>
+            <div class="tx"><b>Follower history</b><small>Daily follower count &middot; last 365 days</small></div>
+            <div class="chk">&#10003;</div>
+          </div>
+        </div>
+
+        <div class="range">
+          <div class="rl">Video date range</div>
+          <div class="dates">
+            <input type="date" value="2026-03-01" />
+            <input type="date" value="2026-06-20" />
+          </div>
+          <div class="presets">
+            <button>30d</button>
+            <button class="on">3 mo</button>
+            <button>1 yr</button>
+            <button>All</button>
+          </div>
+        </div>
+
+        <button class="cta" onclick="document.getElementById('formB').classList.add('hide');document.getElementById('resB').classList.add('show')">Export my data</button>
+        <div class="foot">Runs locally in your browser &middot; ~2s per video</div>
+      </div>
+
+      <div class="result" id="resB">
+        <div class="done"><span class="ic">&#10003;</span><p><b>Export complete.</b> Saved to your Downloads &mdash; nothing left your device.</p></div>
+        <div class="dl">
+          <button class="dlbtn"><span class="l"><span>&#128202;</span><span><b>video_performance.csv</b><small>47 rows</small></span></span><span class="arr">&#8595;</span></button>
+          <button class="dlbtn"><span class="l"><span>&#128101;</span><span><b>follower_history.csv</b><small>365 rows</small></span></span><span class="arr">&#8595;</span></button>
+        </div>
+        <div class="note">Send both files to your researcher whenever you&rsquo;re ready.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

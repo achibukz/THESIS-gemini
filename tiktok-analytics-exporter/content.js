@@ -58,15 +58,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     );
     return true;
   }
-  if (msg?.type === 'is-studio-page') {
-    sendResponse({ ok: true, isStudio: isStudioContentPage() });
-    return false;
-  }
 });
-
-function isStudioContentPage() {
-  return /\/(creator-center|tiktokstudio)\/content/i.test(window.location.pathname);
-}
 
 function pageFetch(url, headers) {
   const reqId = `req-${Date.now()}-${Math.random().toString(36).slice(2)}`;

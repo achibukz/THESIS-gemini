@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Mockup C — Guided wizard</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#ffffff; --ink:#262019; --muted:#8a8175;
+    --line:#ece7df; --accent:#ff6a3d; --accent-soft:#fff0ea; --green:#1c9b63; --green-soft:#e9f7ef;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);display:flex;flex-direction:column;align-items:center;padding:28px 12px;gap:14px}
+  .frame-label{font-size:12px;color:var(--muted);max-width:380px;text-align:center;line-height:1.5}
+  .frame-label b{color:var(--ink)}
+  .popup{width:372px;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    box-shadow:0 14px 36px rgba(38,32,25,.12)}
+  .head{padding:16px 18px 0}
+  .brand{display:flex;align-items:center;justify-content:space-between}
+  .brand h1{margin:0;font-size:15px;font-weight:700}
+  .brand .me{font-size:10.5px;color:var(--muted);background:#f3efe8;padding:3px 9px;border-radius:999px}
+  /* stepper */
+  .steps{display:flex;align-items:center;gap:6px;padding:14px 4px 6px}
+  .step{display:flex;align-items:center;gap:6px;flex:1}
+  .step .num{width:22px;height:22px;border-radius:50%;background:#efeae2;color:var(--muted);
+    display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+  .step .lbl{font-size:10.5px;color:var(--muted);white-space:nowrap}
+  .step.on .num{background:var(--accent);color:#fff}
+  .step.on .lbl{color:var(--ink);font-weight:600}
+  .step.done .num{background:var(--green);color:#fff}
+  .step .line{height:2px;background:#efeae2;flex:1;border-radius:2px}
+  .body{padding:8px 18px 18px}
+  .panel{display:none}.panel.on{display:block}
+  .title{font-size:15px;font-weight:700;margin:6px 0 4px}
+  .desc{font-size:12px;color:var(--muted);line-height:1.55;margin:0 0 14px}
+  /* step1 reassurance */
+  .reassure{background:var(--accent-soft);border:1px solid #ffd9cb;border-radius:12px;padding:13px;margin-bottom:14px}
+  .reassure ul{margin:0;padding-left:18px}
+  .reassure li{font-size:11.5px;color:#9a4a2c;line-height:1.7}
+  /* deliverable cards step2 */
+  .cards{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+  .dcard{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;padding:12px;background:#fffdfa}
+  .dcard .em{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;flex:none}
+  .dcard.v .em{background:#fff0ea;color:var(--accent)}
+  .dcard.f .em{background:#eaf6ff;color:#2b7fd9}
+  .dcard h3{margin:0;font-size:12.5px;font-weight:650}
+  .dcard p{margin:2px 0 0;font-size:11px;color:var(--muted);line-height:1.45}
+  .range{margin-bottom:6px}
+  .rl{font-size:11px;color:var(--muted);margin-bottom:7px;font-weight:600}
+  .dates{display:flex;gap:8px;margin-bottom:8px}
+  .dates input{flex:1;font:inherit;font-size:11.5px;padding:8px;border:1px solid var(--line);border-radius:9px}
+  .presets{display:flex;gap:6px;flex-wrap:wrap}
+  .presets button{font:inherit;font-size:10.5px;padding:5px 11px;border:1px solid var(--line);background:#fff;border-radius:999px;color:var(--muted);cursor:pointer}
+  .presets button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  /* nav buttons */
+  .nav{display:flex;gap:9px;margin-top:16px}
+  .cta{flex:1;border:none;background:var(--accent);color:#fff;font:inherit;font-weight:700;font-size:13px;
+    padding:12px;border-radius:11px;cursor:pointer;box-shadow:0 6px 14px rgba(255,106,61,.3)}
+  .cta:hover{background:#f1592e}
+  .back{border:1px solid var(--line);background:#fff;color:var(--muted);font:inherit;font-size:12px;
+    padding:12px 16px;border-radius:11px;cursor:pointer}
+  /* step3 done */
+  .done-hero{text-align:center;padding:6px 0 4px}
+  .done-hero .big{width:54px;height:54px;border-radius:50%;background:var(--green-soft);color:var(--green);
+    display:grid;place-items:center;font-size:26px;margin:0 auto 10px}
+  .dl{display:flex;flex-direction:column;gap:9px;margin:14px 0 12px}
+  .dlbtn{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:11px;
+    padding:11px 13px;cursor:pointer;font:inherit;background:#fff}
+  .dlbtn:hover{border-color:var(--accent)}
+  .dlbtn .l{display:flex;align-items:center;gap:9px}
+  .dlbtn b{font-size:12px}.dlbtn small{display:block;color:var(--muted);font-size:10px;font-weight:400}
+  .dlbtn .arr{color:var(--accent);font-weight:700}
+  .sendnote{background:#f3efe8;border-radius:11px;padding:11px 13px;font-size:11px;color:#5f574b;line-height:1.5;text-align:center}
+</style>
+</head>
+<body>
+  <div class="frame-label"><b>Option C — Guided wizard.</b> Step-by-step hand-holding (Welcome &rarr; Choose &rarr; Done). Best for non-technical participants. One clear action per screen. Use the buttons to click through.</div>
+
+  <div class="popup">
+    <div class="head">
+      <div class="brand">
+        <h1>My Stats Helper</h1>
+        <span class="me">your data &middot; stays with you</span>
+      </div>
+      <div class="steps">
+        <div class="step on" id="s1"><span class="num">1</span><span class="lbl">Welcome</span></div>
+        <span class="line"></span>
+        <div class="step" id="s2"><span class="num">2</span><span class="lbl">Choose</span></div>
+        <span class="line"></span>
+        <div class="step" id="s3"><span class="num">3</span><span class="lbl">Done</span></div>
+      </div>
+    </div>
+
+    <div class="body">
+      <!-- STEP 1 -->
+      <div class="panel on" id="p1">
+        <div class="title">Let&rsquo;s back up your own stats</div>
+        <p class="desc">This helper gathers the analytics TikTok already lets you, the creator, see about your account &mdash; and saves them as files you keep.</p>
+        <div class="reassure">
+          <ul>
+            <li>Runs entirely on <b>your computer</b></li>
+            <li>Nothing is uploaded anywhere</li>
+            <li><b>You</b> decide what to share, and with whom</li>
+          </ul>
+        </div>
+        <div class="nav">
+          <button class="cta" onclick="go(2)">Get started &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="panel" id="p2">
+        <div class="title">Two files, one click</div>
+        <p class="desc">We&rsquo;ll prepare both at once.</p>
+        <div class="cards">
+          <div class="dcard v">
+            <div class="em">&#128202;</div>
+            <div><h3>Video performance</h3><p>Views, watch time &amp; retention per video, for the range you pick.</p></div>
+          </div>
+          <div class="dcard f">
+            <div class="em">&#128101;</div>
+            <div><h3>Follower history</h3><p>Your daily follower count over the last 365 days.</p></div>
+          </div>
+        </div>
+        <div class="range">
+          <div class="rl">Which video dates?</div>
+          <div class="dates">
+            <input type="date" value="2026-03-01" />
+            <input type="date" value="2026-06-20" />
+          </div>
+          <div class="presets">
+            <button>30 days</button>
+            <button class="on">3 months</button>
+            <button>1 year</button>
+            <button>All</button>
+          </div>
+        </div>
+        <div class="nav">
+          <button class="back" onclick="go(1)">Back</button>
+          <button class="cta" onclick="go(3)">Prepare my files</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="panel" id="p3">
+        <div class="done-hero">
+          <div class="big">&#10003;</div>
+          <div class="title">All done!</div>
+          <p class="desc">Both files are saved on your computer.</p>
+        </div>
+        <div class="dl">
+          <button class="dlbtn"><span class="l"><span>&#128202;</span><span><b>video_performance.csv</b><small>47 videos</small></span></span><span class="arr">&#8595;</span></button>
+          <button class="dlbtn"><span class="l"><span>&#128101;</span><span><b>follower_history.csv</b><small>365 days</small></span></span><span class="arr">&#8595;</span></button>
+        </div>
+        <div class="sendnote">When you&rsquo;re ready, send <b>both files</b> to your researcher. Sharing is your choice &mdash; thank you for helping the study!</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function go(n){
+    for(var i=1;i<=3;i++){
+      document.getElementById('p'+i).classList.toggle('on', i===n);
+      var s=document.getElementById('s'+i);
+      s.classList.toggle('on', i===n);
+      s.classList.toggle('done', i<n);
+    }
+  }
+</script>
+</body>
+</html>
