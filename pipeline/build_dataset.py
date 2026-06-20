@@ -10,6 +10,7 @@ See docs/2026-06-21-multi-creator-merge-design.md for the design spec.
 from __future__ import annotations
 
 import re
+from collections import defaultdict
 from pathlib import Path
 
 import pandas as pd
@@ -45,6 +46,88 @@ def parse_filename(path: Path) -> tuple[str, str, str]:
     if not m:
         raise ParseError(f"Filename does not match expected pattern: {path.name}")
     return m.group("kind"), m.group("slug"), m.group("date")
+
+
+class InputError(ValueError):
+    """Raised when the discovered input set is invalid for the merge."""
+
+
+def discover_inputs(
+    roster: pd.DataFrame,
+    inputs_dir: Path,
+) -> dict[str, dict[str, Path]]:
+    """Discover per-creator video/follower CSVs in ``inputs_dir``.
+
+    Returns ``{pseudonymous_id: {"videos": Path, "followers": Path}}``.
+
+    Raises ``InputError`` with the full list of problems if anything is
+    wrong: unknown handle in filename, missing pair, orphan roster row,
+    or duplicate donation for the same handle+kind.
+    """
+    handle_to_id: dict[str, str] = {}
+    for _, row in roster.iterrows():
+        slug = sanitize_handle(row["creator_handle"])
+        handle_to_id[slug] = row["pseudonymous_id"]
+
+    files_by_slug_kind: dict[tuple[str, str], list[Path]] = defaultdict(list)
+    problems: list[str] = []
+
+    for path in sorted(inputs_dir.glob("tiktok_*.csv")):
+        try:
+            kind, slug, _ = parse_filename(path)
+        except ParseError as e:
+            problems.append(str(e))
+            continue
+        files_by_slug_kind[(slug, kind)].append(path)
+
+    for (slug, kind), paths in files_by_slug_kind.items():
+        if len(paths) > 1:
+            problems.append(
+                f"duplicate donation: {len(paths)} {kind} files for handle "
+                f"'{slug}': {[p.name for p in paths]}"
+            )
+
+    seen_slugs = {slug for (slug, _) in files_by_slug_kind}
+    for slug in seen_slugs:
+        if slug not in handle_to_id:
+            problems.append(
+                f"unknown handle in filename: '{slug}' is not in roster"
+            )
+
+    for slug in seen_slugs:
+        if slug not in handle_to_id:
+            continue
+        has_videos = (slug, "videos") in files_by_slug_kind
+        has_followers = (slug, "followers") in files_by_slug_kind
+        if has_videos and not has_followers:
+            problems.append(
+                f"missing follower file for handle '{slug}'"
+            )
+        if has_followers and not has_videos:
+            problems.append(
+                f"missing video file for handle '{slug}'"
+            )
+
+    for slug, pseudo_id in handle_to_id.items():
+        if slug not in seen_slugs:
+            problems.append(
+                f"orphan roster row: pseudonymous_id={pseudo_id} "
+                f"(handle slug '{slug}') has no input files"
+            )
+
+    if problems:
+        joined = "\n  • ".join(problems)
+        raise InputError(
+            f"Discovered {len(problems)} input problem(s):\n  • {joined}"
+        )
+
+    result: dict[str, dict[str, Path]] = {}
+    for slug, pseudo_id in handle_to_id.items():
+        result[pseudo_id] = {
+            "videos": files_by_slug_kind[(slug, "videos")][0],
+            "followers": files_by_slug_kind[(slug, "followers")][0],
+        }
+    return result
 
 
 REQUIRED_ROSTER_COLUMNS = [
